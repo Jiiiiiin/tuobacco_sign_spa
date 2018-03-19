@@ -4,6 +4,7 @@ import router from './router'
 import Vuex from 'vuex'
 import Navigation from 'vue-navigation'
 import ViewPlus from 'vue-viewplus'
+import VueLazyload from 'vue-lazyload'
 import plugins from './store/plugins'
 import {Loading} from 'element-ui';
 import './assets/styl/index.styl'
@@ -17,6 +18,13 @@ const store = new Vuex.Store({
 })
 
 Vue.use(Navigation, {router, store})
+
+Vue.use(VueLazyload, {
+    preLoad: 1.3,
+    error: require('./assets/img/lazy_defult_img.png'),
+    loading: require('./assets/img/lazy_defult_img.png'),
+    attempt: 1
+})
 
 let loadingInstance = null
 

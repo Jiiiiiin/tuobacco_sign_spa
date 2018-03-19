@@ -1,11 +1,11 @@
 <template>
-    <div class="wechat-sign-tobacco" ref="wechatSignDiv">
+    <div class="wechat-sign-tobacco">
         <div class="item-logo">
-            <img class="logo-img" src="../assets/img/logo-ty.png" alt="">
+            <img class="logo-img" src="../assets/img/logo-ty.png" alt="云南中烟">
         </div>
         <div class="box">
             <div class="item-ye">
-                <div class="ye">
+                <div class="ye" v-lazy:background-image="">
                     <div class="ye-top-empty"></div>
                     <we-chat-sign-photo-item-box
                             v-for="item in photoData"
@@ -19,19 +19,11 @@
         </div>
         <div class="lottery-box">
             <div class="item-lottery-record">
-                <img class="item-lottery-record-img-1" src="../assets/img/chouj-01.jpg" alt="">
-                <img src="../assets/img/chouj-01.jpg" alt="">
-                <img class="item-lottery-record-img-1" src="../assets/img/chouj-01.jpg" alt="">
-                <img src="../assets/img/chouj-01.jpg" alt="">
-                <img class="item-lottery-record-img-1" src="../assets/img/chouj-01.jpg" alt="">
-                <img src="../assets/img/chouj-01.jpg" alt="">
-                <img class="item-lottery-record-img-1" src="../assets/img/chouj-01.jpg" alt="">
-                <img src="../assets/img/chouj-01.jpg" alt="">
-                <img class="item-lottery-record-img-1" src="../assets/img/chouj-01.jpg" alt="">
-                <img src="../assets/img/chouj-01.jpg" alt="">
+                <img class="item-lottery-record-img-1" v-lazy="item.url" alt=""
+                     v-for="item in itemLotteryRecord">
             </div>
             <div class="item-lottery-btn">
-                <img src="../assets/img/lottery-btn.png" alt="">
+                <img src="../assets/img/lottery-btn.png" alt="点击抽奖" @click="onLotteryBtnTap">
             </div>
         </div>
     </div>
@@ -49,8 +41,7 @@
         },
         data() {
             return {
-                // imgUrl: `${this.$vp.options.appUrl}/public/img/def_phto_item.png`
-                // defPhotoImgUrl: `http://img5.imgtn.bdimg.com/it/u=1648644770,3129302077&fm=27&gp=0.jpg`
+                itemLotteryRecord: [],
                 defPhotoImgUrl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
                 photoData: [
                     {
@@ -319,27 +310,19 @@
             }
         },
         methods: {
-            _initStyleOnPageLoad() {
-                this.$nextTick(() => {
-                    // const photoRow1Box = this.$refs.photoRow1Box
-                    // console.log(photoRow1Box)
-                    // const clientWidth = document.body.clientWidth
-                    // const last = clientWidth * 0.25
-                    // const bgImg = this.$refs.bgImg
-                    // // bgImg.width = clientWidth - last
-                    // // !以防存在兼容性问题预留
-                    // const clientHeight = document.body.clientHeight
-                    // console.log(clientHeight, clientWidth)
-                    // bgImg.height = `${clientHeight}px`
-                    // const pageMarginLeft = `${last / 2}px`
-                    // const wechatSignDiv = this.$refs.wechatSignDiv
-                    // wechatSignDiv.style.paddingLeft = pageMarginLeft
-                })
+            onLotteryBtnTap() {
+                alert(1)
             }
         },
+        created() {
+            for (let i = 1; i < 11; i++) {
+                this.itemLotteryRecord.push({
+                    url: `${this.$vp.options.appUrl}/img/chouj-${i}.jpg`
+                })
+            }
+            console.log('item', this.itemLotteryRecord)
+        },
         mounted() {
-            this._initStyleOnPageLoad()
-            console.log(this.photoRow1BoxItemData)
         }
     }
 </script>
@@ -359,7 +342,7 @@
                 width 900px
         .lottery-box
             position absolute
-            top:33%
+            top: 33%
             right 0
             width 20%
             display flex
@@ -377,9 +360,6 @@
                 img
                     width 60px
                     margin-bottom 5px
-
-        /*.item-lottery*/
-            /*align-items: flex-end*/
         .box
             display: flex
             background-color: #7a0402
@@ -390,8 +370,6 @@
             .box-item
                 flex: 1;
             .item-ye
-                background-color: #fff
-                /*border 1px solid #fff*/
                 .ye
                     width 979px
                     height 734px
