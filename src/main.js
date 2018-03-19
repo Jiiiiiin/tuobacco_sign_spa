@@ -27,59 +27,40 @@ Vue.use(VueLazyload, {
 })
 
 let loadingInstance = null
+export const BASE_URL = 'http://192.168.3.43:8080'
 
 Vue.use(ViewPlus, {
     router,
     store,
     errorHandler(err) {
-        if(!(err instanceof Error))
+        if(!(err instanceof Error) || !err)
             console.error(err)
         if (err) {
             const message = err.message
             if (message && !message.includes('onLoginStateCheckFaild')) {
                 console.error(err, 'is Error')
             }
-        } else {
-            this.uiDialog('err参数错误', {title: '捕获到全局错误'})
         }
     },
     env: 'BROWSER',
     debug: process.env.NODE_ENV !== 'production',
-    appUrl: 'http://localhost:8080',
+    appUrl: BASE_URL,
     utilCache: {
         enable: true,
     },
     utilHttp: {
-        baseURL: 'http://localhost:3000',
+        baseURL: BASE_URL,
         // withCredentials: true,
         timeout: '3000',
         headers: {
             Accept: 'application/json, text/plain, */*'
         },
-        params: {
-            BankId: '9999',
-            LoginType: 'K',
-            _locale: 'zh_CN'
-        },
-        dataKey: 'ResData',
         statusCodeKey: 'ReturnCode',
         statusCode: '000000',
         msgKey: 'ReturnMessage',
-        needBase64DecodeMsg: false,
-        defShowLoading: true,
-        onPageTo: null,
-        onPageReplace: null,
-        onPageNext: null,
-        onPageGoBack: null,
-        onPageHref: null,
-        onSendAjaxRespErr: (response) => {
-            console.log(`example on onSendAjaxRespErr called ${response}`)
-            return false
-        },
+        defShowLoading: false,
         onReqErrPaserMsg: (response, errMsg) => {
-            console.log(`example on onReqErrPaserMsg called: ${response} ${errMsg}`)
-            // 返回空标识不处理错误消息解析
-            return `onReqErrPaserMsg回调应用处理返回：${errMsg}`
+            return `${errMsg} [服务端]`
         },
         loading(_showLoading) {
             if (_showLoading) {

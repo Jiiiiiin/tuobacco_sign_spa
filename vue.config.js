@@ -6,18 +6,18 @@ function resolve (dir) {
 }
 
 module.exports = {
-    // configureWebpack: () => {
-    //     module: {
-    //         rules: [
-    //             {
-    //                 test: /\.js$/,
-    //                 loader: 'babel-loader',
-    //                 include: [resolve('src'), resolve('node_modules/vue-viewplus/src/')]
-    //             }
-    //
-    //         ]
-    //     }
-    // },
+    devServer: {
+        proxy: {
+            '/': {
+                target: 'http://yun2.tuobacco.com/',
+                // target: 'http://192.168.1.109:8081',
+                changeOrigin: true,
+                // pathRewrite: {
+                //     '^/pweb': '/pweb'
+                // }
+            }
+        }
+    },
     chainWebpack: config => {
         config.module
             .rule('js')

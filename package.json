@@ -11,6 +11,7 @@
     "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
     "element-ui": "^2.2.2",
+    "qs": "^6.5.1",
     "vue": "^2.5.13",
     "vue-lazyload": "^1.2.2",
     "vue-navigation": "^1.1.3",

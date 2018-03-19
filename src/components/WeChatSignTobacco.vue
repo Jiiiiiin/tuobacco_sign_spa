@@ -1,11 +1,11 @@
 <template>
     <div class="wechat-sign-tobacco">
         <div class="item-logo">
-            <img class="logo-img" src="../assets/img/logo-ty.png" alt="云南中烟">
+            <img class="logo-img" v-lazy="logoBg" alt="云南中烟">
         </div>
         <div class="box">
             <div class="item-ye">
-                <div class="ye" v-lazy:background-image="">
+                <div class="ye" v-lazy:background-image="yeBg">
                     <div class="ye-top-empty"></div>
                     <we-chat-sign-photo-item-box
                             v-for="item in photoData"
@@ -19,11 +19,12 @@
         </div>
         <div class="lottery-box">
             <div class="item-lottery-record">
-                <img class="item-lottery-record-img-1" v-lazy="item.url" alt=""
-                     v-for="item in itemLotteryRecord">
+                <div class="lottery-record-img-box" v-for="item in itemLotteryRecord" :key="item.id">
+                    <img class="item-lottery-record-img" v-lazy="item.hashData ? item.headimgurl: item.url" :data-id="item.id">
+                </div>
             </div>
             <div class="item-lottery-btn">
-                <img src="../assets/img/lottery-btn.png" alt="点击抽奖" @click="onLotteryBtnTap">
+                <img v-lazy="lotteryBtn" alt="点击抽奖" @click="onLotteryBtnTap">
             </div>
         </div>
     </div>
@@ -41,8 +42,32 @@
         },
         data() {
             return {
+                /**
+                 * 中奖纪录查询
+                 * @param meetingId
+                 * @param sessionId
+                 */
+                REQ_meetingDrawQuery: '',
+                /**
+                 * transcode: 查询参会人员列表
+                 * 查询参会人员列表
+                 * @param currentIndex 默认为0则查询全量数据
+                 * @param meetingId
+                 * @param sessionId
+                 */
+                REQ_participantQuery: '',
+                REQ_participantQuery_currentIndex: 0,
+                /**
+                 * transcode: 抽奖
+                 * 支持重复抽奖，将原有抽奖纪录置为无效后重新抽奖
+                 * @param meetingId
+                 * @param sessionId
+                 */
+                REQ_meetingDraw: '',
                 itemLotteryRecord: [],
-                defPhotoImgUrl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
+                lotteryBtn: `${this.$vp.options.appUrl}/img/lottery-btn.png`,
+                yeBg: `${this.$vp.options.appUrl}/img/ye-bg.jpg`,
+                logoBg: `${this.$vp.options.appUrl}/img/logo-ty.png`,
                 photoData: [
                     {
                         id: 1,
@@ -311,16 +336,59 @@
         },
         methods: {
             onLotteryBtnTap() {
-                alert(1)
+                this.$vp.ajaxMixin(this.REQ_meetingDraw, {
+                    params: {drawNum: 1}
+                }).then(res => {
+                   this._paseRecordData(res)
+                    // 下面的是老接口 同步返回一个中奖用户的情况
+                    // const len = this.itemLotteryRecord.length
+                    // for (let i = 0; i < len; i++) {
+                    //     let oldItem = this.itemLotteryRecord[i]
+                    //     if(oldItem.hashData){
+                    //         continue
+                    //     }
+                    //     oldItem.hashData = true
+                    //     this.itemLotteryRecord[i] = {...oldItem, ...weInfo}
+                    // }
+                })
+            },
+            _paseRecordData(res) {
+                const data = res.List
+                const len = data.length
+                for (let i = 0; i < len; i++) {
+                    let oldItem = this.itemLotteryRecord[i]
+                    oldItem.hashData = true
+                    let weInfo = data[i]
+                    this.itemLotteryRecord[i] = {...oldItem, ...weInfo}
+                }
+            },
+            _initItemLotteryRecordArr() {
+                for (let i = 1; i < 11; i++) {
+                    this.itemLotteryRecord.push({
+                        url: `${this.$vp.options.appUrl}/img/chouj-${i}.jpg`,
+                        hashData: false
+                    })
+                }
+            },
+            _loadWeChartData() {
+                // 加载微信与会人员数据
+            },
+            _loadLotteryRecordData() {
+                // 加载中奖数据, 中奖纪录查询
+                this.$vp.ajaxMixin(this.REQ_meetingDrawQuery).then(res => {
+                    this._paseRecordData(res)
+                })
             }
         },
         created() {
-            for (let i = 1; i < 11; i++) {
-                this.itemLotteryRecord.push({
-                    url: `${this.$vp.options.appUrl}/img/chouj-${i}.jpg`
-                })
-            }
-            console.log('item', this.itemLotteryRecord)
+            this.meetingId = this.$route.params.meetingId
+            this.sessionId = this.$route.params.sessionId
+            this.REQ_meetingDrawQuery = `weixin-meeting/${this.meetingId}/${this.sessionId}/meetingDrawQuery`
+            this.REQ_participantQuery = `weixin-meeting/${this.meetingId}/${this.sessionId}/participantQuery`
+            this.REQ_meetingDraw = `weixin-meeting/${this.meetingId}/${this.sessionId}/meetingDraw/1`
+            this._initItemLotteryRecordArr()
+            this._loadWeChartData()
+            this._loadLotteryRecordData()
         },
         mounted() {
         }
@@ -355,11 +423,13 @@
                 order 0
                 width 135px
                 margin-left 10px
-                .item-lottery-record-img-1
-                    margin-right 5px
-                img
+                .lottery-record-img-box
                     width 60px
-                    margin-bottom 5px
+                    float left
+                    margin-right 5px
+                    .item-lottery-record-img
+                        width 60px
+                        margin-bottom 5px
         .box
             display: flex
             background-color: #7a0402
@@ -374,7 +444,6 @@
                     width 979px
                     height 734px
                     margin 0 auto
-                    background-image url(../assets/img/ye-bg.jpg);
                     .ye-top-empty
                         height 69px
                     .photo-row-2

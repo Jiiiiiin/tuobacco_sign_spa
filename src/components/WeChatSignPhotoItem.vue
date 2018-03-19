@@ -1,6 +1,6 @@
 <template>
     <div class="photo-item" :style="{marginLeft: marginLeft+'px'}">
-        <img :src="imgUrl">
+        <img v-lazy="imgUrl">
     </div>
 </template>
 
@@ -11,7 +11,7 @@
             imgUrl: {
                 type: String,
                 required: true,
-                default: '../../public/img/def_phto_item.png'
+                default: '../../public/img/lazy_defult_img.png'
             },
             name: {
                 type: String,
@@ -31,7 +31,6 @@
         height 24px
         float: left
         margin-right 4px
-        background-color: green
         img
             width 22px
             height 22px
