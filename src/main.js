@@ -6,6 +6,7 @@ import Navigation from 'vue-navigation'
 import ViewPlus from 'vue-viewplus'
 import plugins from './store/plugins'
 import {Loading} from 'element-ui';
+import './assets/styl/index.styl'
 
 Vue.use(Vuex)
 

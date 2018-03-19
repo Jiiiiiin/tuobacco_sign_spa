@@ -1,0 +1,105 @@
+// 背景图片
+bg-image($url)
+  background-image: url($url + "@2x.png")
+  @media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3)
+    background-image: url($url + "@3x.png")
+
+// 不换行
+no-wrap()
+  text-overflow: ellipsis
+  overflow: hidden
+  white-space: nowrap
+
+// 扩展点击区域
+extend-click()
+  position: relative
+  &:before
+    content: ''
+    position: absolute
+    top: -10px
+    left: -10px
+    right: -10px
+    bottom: -10px
+
+// 容器底部一像素
+border-1px($color)
+  position: relative
+  &:after
+    display: block
+    position: absolute
+    left: 0
+    bottom: 0
+    width: 100%
+    border-top: 1px solid $color
+    content: ' '
+
+@media (-webkit-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5)
+  .border-1px
+    &::after
+      -webkit-transform: scaleY(0.7)
+      transform: scaleY(0.7)
+
+@media (-webkit-min-device-pixel-ratio: 2),(min-device-pixel-ratio: 2)
+  .border-1px
+    &::after
+      -webkit-transform: scaleY(0.5)
+      transform: scaleY(0.5)
+
+// 容器底部一像素
+border-1px-top($color)
+  position: relative
+  &:before
+    display: block
+    position: absolute
+    left: 0
+    bottom: 0
+    width: 100%
+    border-top: 1px solid $color
+    content: ' '
+
+@media (-webkit-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5)
+  .border-1px-top
+    &::before
+      -webkit-transform: scaleY(0.7)
+      transform: scaleY(0.7)
+
+@media (-webkit-min-device-pixel-ratio: 2),(min-device-pixel-ratio: 2)
+  .border-1px-top
+    &::before
+      -webkit-transform: scaleY(0.5)
+      transform: scaleY(0.5)
+
+input()
+  font-size $font-size-input
+  padding-right 5px
+  height: 31px
+  vertical-align: super
+  line-height: 31px
+  text-align right
+  color $color-input
+
+label()
+  font-size $font-size-label
+  color $color-label
+
+txt-hint()
+  font-size $font-size-medium-s
+  color $color-hint-txt
+  line-height 20px
+
+label-hint()
+  font-size: $font-size-medium-s
+  color: $color-showfield-lable
+
+input-hint()
+  font-size: $font-size-medium-s
+  color: $color-showfield-value
+
+text-special()
+  font-size: $font-size-special-l
+  color $color-theme
+
+//box-shadow 属性适用于盒子阴影 grey
+// 水平阴影的位置 垂直阴影的位置 模糊距离 阴影的尺寸 阴影的颜色
+box-shadow()
+  box-shadow 2px 2px 8px 0px #D8D8D8
