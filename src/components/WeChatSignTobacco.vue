@@ -12,7 +12,10 @@
                             :key="item.id"
                             :item-data="item.list"
                             :margin-left="item.marginLeft"
-                            :margin-top="item.marginTop">
+                            :margin-top="item.marginTop"
+                            class="participantRecord"
+                            :id="'hack,'+(item.maxNumb === item.list.length ? 1 : 0)">
+                        <!--1标识已经加载完毕， 0标识还可以填充-->
                     </we-chat-sign-photo-item-box>
                 </div>
             </div>
@@ -20,7 +23,8 @@
         <div class="lottery-box">
             <div class="item-lottery-record">
                 <div class="lottery-record-img-box" v-for="item in itemLotteryRecord" :key="item.id">
-                    <img class="item-lottery-record-img" v-lazy="item.hashData ? item.headimgurl: item.url" :data-id="item.id">
+                    <img class="item-lottery-record-img" v-lazy="item.hashData ? item.headimgurl: item.url"
+                         :data-id="item.id">
                 </div>
             </div>
             <div class="item-lottery-btn">
@@ -51,17 +55,19 @@
                 /**
                  * transcode: 查询参会人员列表
                  * 查询参会人员列表
-                 * @param currentIndex 默认为0则查询全量数据
+                 * @param currentIndex 默认为0则查询全量数据，只需要跟踪与会记录列表返回的最后一个用户的id即可
                  * @param meetingId
                  * @param sessionId
                  */
                 REQ_participantQuery: '',
+                // 最后一个查询记录的用户的id
                 REQ_participantQuery_currentIndex: 0,
                 /**
                  * transcode: 抽奖
                  * 支持重复抽奖，将原有抽奖纪录置为无效后重新抽奖
                  * @param meetingId
                  * @param sessionId
+                 * @param drawNum 需要抽取的总中奖人数
                  */
                 REQ_meetingDraw: '',
                 itemLotteryRecord: [],
@@ -92,126 +98,49 @@
                         maxNumb: 10,
                         marginLeft: 228,
                         marginTop: 13,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            }
-                        ]
+                        list: []
                     },
                     {
                         id: 3,
                         maxNumb: 10,
                         marginLeft: 248,
                         marginTop: 13,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            }
-                        ]
+                        list: []
                     },
                     {
                         id: 4,
                         maxNumb: 11,
                         marginLeft: 269,
                         marginTop: 8,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            }
-                        ]
+                        list: []
                     },
                     {
                         id: 5,
                         maxNumb: 12,
                         marginLeft: 288,
                         marginTop: 12,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            }
-                        ]
+                        list: []
                     },
                     {
                         id: 6,
                         maxNumb: 12,
                         marginLeft: 318,
                         marginTop: 12,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            }
-                        ]
+                        list: []
                     },
                     {
                         id: 7,
                         maxNumb: 11,
                         marginLeft: 368,
                         marginTop: 12,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            }
-                        ]
+                        list: []
                     },
                     {
                         id: 8,
                         maxNumb: 11,
                         marginLeft: 396,
                         marginTop: 12,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            }
-                        ]
+                        list: []
                     },
                     {
                         id: 9,
@@ -267,92 +196,55 @@
                         maxNumb: 9,
                         marginLeft: 250,
                         marginTop: 15,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            },
-
-                        ]
+                        list: []
                     },
                     {
                         id: 11,
                         maxNumb: 11,
                         marginLeft: 211,
                         marginTop: 12,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            }
-                        ]
+                        list: []
                     },
                     {
                         id: 12,
                         maxNumb: 11,
                         marginLeft: 232,
                         marginTop: 9,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            }
-                        ]
+                        list: []
                     },
                     {
                         id: 13,
                         maxNumb: 13,
                         marginLeft: 221,
                         marginTop: 12,
-                        list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            }
-                        ]
+                        list: []
                     }
 
                 ],
             }
         },
         methods: {
+            // 抽奖
             onLotteryBtnTap() {
-                this.$vp.ajaxMixin(this.REQ_meetingDraw, {
+                this.$vp.ajaxGet(this.REQ_meetingDraw, {
                     params: {drawNum: 1}
-                }).then(res => {
-                   this._paseRecordData(res)
+                }).then(weInfo => {
+                    // 这个是如果后台返回的是全量记录，同样可以达到目的
+                    // this._paseWinningRecordData(res)
                     // 下面的是老接口 同步返回一个中奖用户的情况
-                    // const len = this.itemLotteryRecord.length
-                    // for (let i = 0; i < len; i++) {
-                    //     let oldItem = this.itemLotteryRecord[i]
-                    //     if(oldItem.hashData){
-                    //         continue
-                    //     }
-                    //     oldItem.hashData = true
-                    //     this.itemLotteryRecord[i] = {...oldItem, ...weInfo}
-                    // }
+                    const len = this.itemLotteryRecord.length
+                    for (let i = 0; i < len; i++) {
+                        let oldItem = this.itemLotteryRecord[i]
+                        if(oldItem.hashData){
+                            continue
+                        }
+                        oldItem.hashData = true
+                        this.itemLotteryRecord[i] = {...oldItem, ...weInfo}
+                    }
                 })
             },
-            _paseRecordData(res) {
+            // 处理中奖纪录
+            _paseWinningRecordData(res) {
                 const data = res.List
                 const len = data.length
                 for (let i = 0; i < len; i++) {
@@ -370,13 +262,54 @@
                     })
                 }
             },
-            _loadWeChartData() {
-                // 加载微信与会人员数据
+            // 处理查询回来的参会记录
+            _paseParticipantRecords(res) {
+                console.log('_paseParticipantRecords', res)
+                // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
+                // this.REQ_participantQuery_currentIndex
+
+                // 1.先判断哪一行空着
+                let participantRecord = document.getElementsByClassName('participantRecord')
+                const len = participantRecord.length
+                for (let i = 0; i < len; i++) {
+                    let rowRecordDiv = participantRecord[i]
+                    console.log(rowRecordDiv, 'rowRecordDiv')
+                    rowRecordDiv = null
+                }
+                // 释放dom引用
+                participantRecord = null
+                // const data = res.List
+                // const len = data.length
+                // for (let i = 0; i < len; i++) {
+                //
+                // }
             },
+            // 查询所有参会记录
+            _loadAllParticipantRecords() {
+                this.$vp.ajaxGet(this.REQ_participantQuery, {
+                    params: {
+                        currentIndex: this.REQ_participantQuery_currentIndex
+                    }
+                }).then(res => {
+                    this._paseParticipantRecords(res)
+                })
+            },
+            _pollingParticipantRecords() {
+                setTimeout(() => {
+                    // 两个接口返回相同数据故在此做处理
+                    // _loadAllParticipantRecords()
+                    console.log('准备轮询')
+                }, 10000)
+            },
+            // 加载微信与会人员数据，在页面初始化的时候执行
+            _loadWeChartDataOnPageCreated() {
+                this._loadAllParticipantRecords()
+                this._pollingParticipantRecords()
+            },
+            // 加载中奖数据, 中奖纪录查询
             _loadLotteryRecordData() {
-                // 加载中奖数据, 中奖纪录查询
                 this.$vp.ajaxMixin(this.REQ_meetingDrawQuery).then(res => {
-                    this._paseRecordData(res)
+                    this._paseWinningRecordData(res)
                 })
             }
         },
@@ -385,9 +318,9 @@
             this.sessionId = this.$route.params.sessionId
             this.REQ_meetingDrawQuery = `weixin-meeting/${this.meetingId}/${this.sessionId}/meetingDrawQuery`
             this.REQ_participantQuery = `weixin-meeting/${this.meetingId}/${this.sessionId}/participantQuery`
-            this.REQ_meetingDraw = `weixin-meeting/${this.meetingId}/${this.sessionId}/meetingDraw/1`
+            this.REQ_meetingDraw = `weixin-meeting/${this.meetingId}/${this.sessionId}/meetingDraw`
             this._initItemLotteryRecordArr()
-            this._loadWeChartData()
+            // this._loadWeChartDataOnPageCreated()
             this._loadLotteryRecordData()
         },
         mounted() {
