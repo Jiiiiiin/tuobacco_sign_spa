@@ -37,6 +37,7 @@
 <script type="text/ecmascript-6">
     import WeChatSignPhotoItem from './WeChatSignPhotoItem.vue'
     import WeChatSignPhotoItemBox from './WeChatSignPhotoItemBox.vue'
+    import { Message } from 'element-ui';
 
     // 1标识已经加载完毕， 0标识还可以填充
     const ISFULL = 1
@@ -277,23 +278,27 @@
             },
             // 处理查询回来的参会记录
             _paseParticipantRecords(res) {
-                console.log('_paseParticipantRecords', res)
                 // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
                 // this.REQ_participantQuery_currentIndex
-
+                if(!res){
+                    Message.warning({
+                        message: '现在还木有人签到哦，不然我们的服务器怎么会不返回数据呢？'
+                    });
+                    return
+                }
                 // 1.先判断哪一行空着
-                let participantRecord = document.getElementsByClassName('participantRecord')
-                const len = participantRecord.length
                 const listData = res.List
                 if (listData <= 0) {
                     console.warn('没有参会记录数据需要处理')
                     return
                 }
+                // TODO ! 下面的逻辑好像存在问题
+                let participantRecord = document.getElementsByClassName('participantRecord')
+                const len = participantRecord.length
                 for (let i = 0; i < len; i++) {
                     let rowRecordDiv = participantRecord[i]
                     const harkVal = rowRecordDiv.getAttribute('id')
                     // 格式：1hack,0 rowRecordDiv -》 [itemid]xxx,0(1标识已经加载完毕， 0标识还可以填充)
-                    console.log(harkVal, 'rowRecordDiv')
                     const isFull = harkVal.split(',')[1] === ISFULL
                     if (isFull) {
                         continue
@@ -303,16 +308,22 @@
                         const pushRowLen = pushRow.list.length
                         const pushRowMaxNumb = pushRow.maxNumb
                         const emptyNumb = pushRowMaxNumb - pushRowLen
-                        const popArrData = _popData2ArryByNumb(listData, emptyNumb)
-                        for (let i = 0; i < emptyNumb; i++) {
-                            // 为了实现动画延迟，一个一个飞进去效果，需要进行迭代
-                            // TODO 缺少动画
-                            setTimeout(() => {
-                                const userData = popArrData.pop
-                                console.log(`用户签到啦，飞啦 ${userData}`)
-                                pushRow.push(userData)
-                            }, 1000)
-                        }
+                        const popArrData = this._popData2ArryByNumb(listData, emptyNumb)
+                        console.log(pushRow.list)
+                        console.log(popArrData)
+                        console.log(emptyNumb)
+                        // for (let i = 0; i < emptyNumb; i++) {
+                        //     // 为了实现动画延迟，一个一个飞进去效果，需要进行迭代
+                        //     // TODO 缺少动画
+                        //     setTimeout(() => {
+                        //         const userData = popArrData.pop()
+                        //         console.log(`用户签到啦，飞啦 ${userData}`)
+                        //         Message.success({
+                        //             message: `用户签到啦，飞啦 ${userData}`,
+                        //         })
+                        //         pushRow.list.push(userData)
+                        //     }, 1000)
+                        // }
                     }
                     rowRecordDiv = null
                 }
