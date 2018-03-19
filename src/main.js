@@ -24,15 +24,12 @@ Vue.use(ViewPlus, {
     router,
     store,
     errorHandler(err) {
+        if(!err instanceof Error)
+            console.error(err)
         if (err) {
-            if (err instanceof Error) {
-                const message = err.message
-                if (!message.includes('onLoginStateCheckFaild')) {
-                    alert(1)
-                    console.error(err, 'is Error')
-                }
-            } else {
-                console.error(err)
+            const message = err.message
+            if (message && !message.includes('onLoginStateCheckFaild')) {
+                console.error(err, 'is Error')
             }
         } else {
             this.uiDialog('err参数错误', {title: '捕获到全局错误'})
@@ -40,7 +37,7 @@ Vue.use(ViewPlus, {
     },
     env: 'BROWSER',
     debug: process.env.NODE_ENV !== 'production',
-    appUrl: 'http://localhost:8888',
+    appUrl: 'http://localhost:8080',
     utilCache: {
         enable: true,
     },
@@ -99,5 +96,8 @@ Vue.config.productionTip = false
 
 new Vue({
     router,
-    render: h => h(App)
+    render: h => h(App),
+    mounted() {
+        console.log(this.$vp.options.appUrl)
+    }
 }).$mount('#app')
