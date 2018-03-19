@@ -14,7 +14,7 @@
                             :margin-left="item.marginLeft"
                             :margin-top="item.marginTop"
                             class="participantRecord"
-                            :id="'hack,'+(item.maxNumb === item.list.length ? 1 : 0)">
+                            :id="item.id+'hack,'+(item.maxNumb === item.list.length ? 1 : 0)">
                         <!--1标识已经加载完毕， 0标识还可以填充-->
                     </we-chat-sign-photo-item-box>
                 </div>
@@ -37,6 +37,9 @@
 <script type="text/ecmascript-6">
     import WeChatSignPhotoItem from './WeChatSignPhotoItem.vue'
     import WeChatSignPhotoItemBox from './WeChatSignPhotoItemBox.vue'
+
+    // 1标识已经加载完毕， 0标识还可以填充
+    const ISFULL = 1
 
     export default {
         name: 'HelloWorld',
@@ -235,7 +238,7 @@
                     const len = this.itemLotteryRecord.length
                     for (let i = 0; i < len; i++) {
                         let oldItem = this.itemLotteryRecord[i]
-                        if(oldItem.hashData){
+                        if (oldItem.hashData) {
                             continue
                         }
                         oldItem.hashData = true
@@ -262,6 +265,16 @@
                     })
                 }
             },
+            /**
+             * 从数组中弹出传递数量的item，并返回弹出的item组成的新数组
+             * @param arr
+             * @param popNumb 需要补充的数量
+             * @private
+             */
+            _popData2ArryByNumb(arr, popNumb) {
+                // 后台返回的数据是，最先参加的人排在数组的最后
+
+            },
             // 处理查询回来的参会记录
             _paseParticipantRecords(res) {
                 console.log('_paseParticipantRecords', res)
@@ -271,9 +284,36 @@
                 // 1.先判断哪一行空着
                 let participantRecord = document.getElementsByClassName('participantRecord')
                 const len = participantRecord.length
+                const listData = res.List
+                if (listData <= 0) {
+                    console.warn('没有参会记录数据需要处理')
+                    return
+                }
                 for (let i = 0; i < len; i++) {
                     let rowRecordDiv = participantRecord[i]
-                    console.log(rowRecordDiv, 'rowRecordDiv')
+                    const harkVal = rowRecordDiv.getAttribute('id')
+                    // 格式：1hack,0 rowRecordDiv -》 [itemid]xxx,0(1标识已经加载完毕， 0标识还可以填充)
+                    console.log(harkVal, 'rowRecordDiv')
+                    const isFull = harkVal.split(',')[1] === ISFULL
+                    if (isFull) {
+                        continue
+                    } else {
+                        // 2.找到idx对应的记录
+                        const pushRow = this.photoData[i]
+                        const pushRowLen = pushRow.list.length
+                        const pushRowMaxNumb = pushRow.maxNumb
+                        const emptyNumb = pushRowMaxNumb - pushRowLen
+                        const popArrData = _popData2ArryByNumb(listData, emptyNumb)
+                        for (let i = 0; i < emptyNumb; i++) {
+                            // 为了实现动画延迟，一个一个飞进去效果，需要进行迭代
+                            // TODO 缺少动画
+                            setTimeout(() => {
+                                const userData = popArrData.pop
+                                console.log(`用户签到啦，飞啦 ${userData}`)
+                                pushRow.push(userData)
+                            }, 1000)
+                        }
+                    }
                     rowRecordDiv = null
                 }
                 // 释放dom引用
@@ -320,8 +360,11 @@
             this.REQ_participantQuery = `weixin-meeting/${this.meetingId}/${this.sessionId}/participantQuery`
             this.REQ_meetingDraw = `weixin-meeting/${this.meetingId}/${this.sessionId}/meetingDraw`
             this._initItemLotteryRecordArr()
-            // this._loadWeChartDataOnPageCreated()
+            this._loadWeChartDataOnPageCreated()
             this._loadLotteryRecordData()
+
+            // test
+            this._paseParticipantRecords()
         },
         mounted() {
         }

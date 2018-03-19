@@ -45,7 +45,7 @@ Vue.use(ViewPlus, {
     env: 'BROWSER',
     debug: process.env.NODE_ENV !== 'production',
     appUrl: BASE_URL,
-    utilCache: {
+    utilDom: {
         enable: true,
     },
     utilHttp: {
