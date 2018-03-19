@@ -24,7 +24,7 @@ Vue.use(ViewPlus, {
     router,
     store,
     errorHandler(err) {
-        if(!err instanceof Error)
+        if(!(err instanceof Error))
             console.error(err)
         if (err) {
             const message = err.message

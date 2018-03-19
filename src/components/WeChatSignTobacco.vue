@@ -1,9 +1,9 @@
 <template>
     <div class="wechat-sign-tobacco" ref="wechatSignDiv">
+        <div class="item-logo">
+            <img class="logo-img" src="../assets/img/logo-ty.png" alt="">
+        </div>
         <div class="box">
-            <div class="item-logo">
-                <img class="logo-img" src="../assets/img/logo.png" alt="">
-            </div>
             <div class="item-ye">
                 <div class="ye">
                     <div class="ye-top-empty"></div>
@@ -12,10 +12,26 @@
                             :key="item.id"
                             :item-data="item.list"
                             :margin-left="item.marginLeft"
-                            :margin-top="item.marginTop"
-                    ></we-chat-sign-photo-item-box>
-                    <!--<img class="img-bg" src="../assets/img/test01.jpg" alt="">-->
+                            :margin-top="item.marginTop">
+                    </we-chat-sign-photo-item-box>
                 </div>
+            </div>
+        </div>
+        <div class="lottery-box">
+            <div class="item-lottery-record">
+                <img class="item-lottery-record-img-1" src="../assets/img/chouj-01.jpg" alt="">
+                <img src="../assets/img/chouj-01.jpg" alt="">
+                <img class="item-lottery-record-img-1" src="../assets/img/chouj-01.jpg" alt="">
+                <img src="../assets/img/chouj-01.jpg" alt="">
+                <img class="item-lottery-record-img-1" src="../assets/img/chouj-01.jpg" alt="">
+                <img src="../assets/img/chouj-01.jpg" alt="">
+                <img class="item-lottery-record-img-1" src="../assets/img/chouj-01.jpg" alt="">
+                <img src="../assets/img/chouj-01.jpg" alt="">
+                <img class="item-lottery-record-img-1" src="../assets/img/chouj-01.jpg" alt="">
+                <img src="../assets/img/chouj-01.jpg" alt="">
+            </div>
+            <div class="item-lottery-btn">
+                <img src="../assets/img/lottery-btn.png" alt="">
             </div>
         </div>
     </div>
@@ -334,21 +350,45 @@
         top: 0
         bottom: 0
         width 100%
+        background-color: #7a0402
+        .item-logo
+            position: absolute;
+            top: 0;
+            right: 0;
+            .logo-img
+                width 900px
+        .lottery-box
+            position absolute
+            top:33%
+            right 0
+            width 20%
+            display flex
+            flex-direction column
+            justify-content: flex-start
+            .item-lottery-btn
+                order 1
+                margin-top: 20px
+            .item-lottery-record
+                order 0
+                width 135px
+                margin-left 10px
+                .item-lottery-record-img-1
+                    margin-right 5px
+                img
+                    width 60px
+                    margin-bottom 5px
+
+        /*.item-lottery*/
+            /*align-items: flex-end*/
         .box
             display: flex
             background-color: #7a0402
             align-items: center; /*垂直居中*/
             justify-content: center; /*水平居中*/
-            width: 100%;
+            width: 85%;
             height: 100%;
             .box-item
                 flex: 1;
-            .item-logo
-                position: absolute;
-                top: 0;
-                right: 200px;
-                .logo-img
-                    width 600px
             .item-ye
                 background-color: #fff
                 /*border 1px solid #fff*/
