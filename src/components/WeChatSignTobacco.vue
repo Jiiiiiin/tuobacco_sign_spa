@@ -48,7 +48,8 @@
     Vue.component(Button.name, Button)
 
     // 1标识已经加载完毕， 0标识还可以填充
-    const ISFULL = 1
+    // string类型是因为，从dom获取到的就是这个类型
+    const ISFULL = '1'
     const ERR_DIALOG_TITLE = '开小差了'
 
     export default {
@@ -91,14 +92,16 @@
                 photoData: [
                     {
                         id: 1,
-                        maxNumb: 8,
+                        maxNumb: 2,
+                        // maxNumb: 8,
                         marginLeft: 206,
                         marginTop: 0,
                         list: []
                     },
                     {
                         id: 2,
-                        maxNumb: 10,
+                        maxNumb: 2,
+                        // maxNumb: 10,
                         marginLeft: 228,
                         marginTop: 13,
                         list: []
@@ -291,7 +294,8 @@
                     const rowRecordDivId = rowRecordDiv.getAttribute('id')
                     const harkArr = rowRecordDivId.split(this.SPLIT_FLAG)
                     // 格式：1H0 rowRecordDiv -》 [itemid]H0(1标识已经加载完毕， 0标识还可以填充)
-                    const isFull = harkArr[1] === ISFULL
+                    const flag = harkArr[1]
+                    const isFull = (flag === ISFULL)
                     if (isFull) {
                         // 当前这一行已经填满，那么就调到下一行，进行检查
                         continue
@@ -349,14 +353,14 @@
                     const rowRecordDivId = rowRecordDiv.getAttribute('id')
                     const harkArr = rowRecordDivId.split(this.SPLIT_FLAG)
                     // 格式：1H0 rowRecordDiv -》 [itemid]H0(1标识已经加载完毕， 0标识还可以填充)
-                    const isFull = harkArr[1] === ISFULL
+                    const flag = harkArr[1]
+                    const isFull = (flag === ISFULL)
                     if (isFull) {
                         // 当前这一行已经填满，那么就调到下一行，进行检查
                         continue
                     } else {
                         return {
                             rowRecordDiv,
-                            rowRecordDivId,
                             harkArr,
                         }
                     }
@@ -364,7 +368,7 @@
                 // 释放dom引用
                 participantRecord = null
             },
-            _pasePollingParticipantRecords(amiItem) {
+            _pasePollingParticipantRecords(amiItem, amiFinishListener) {
                 // 延迟执行以便先看到头像被放入叶子
                 setTimeout(() => {
                     // 这里处理动画逻辑
@@ -383,8 +387,56 @@
                     // 设置自动关闭
                     setTimeout(() => {
                         amiItem.click()
-                    }, 3000)
+                        amiFinishListener()
+                    }, 1000)
                 }, 800)
+            },
+            _pollingParticipantRecordsParser(listData) {
+                console.log('listData', listData.length)
+                if(listData.length === 0){
+                    // 递归结束
+                    // TODO 准备开启轮询
+                    return
+                }
+                const userData = listData.shift()
+                // console.log('本次需要处理的客户记录', userData)
+                // TODO 看这里是否要处理
+                // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
+                this.REQ_participantQuery_currentIndex = userData.id
+                // console.log('轮询更新REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
+                // 先更新响应数据，拿到最新的一个img dom
+                let rowRecord = this._getNoFullRowDiv()
+                let rowRecordDiv = rowRecord.rowRecordDiv
+                let harkArr = rowRecord.harkArr
+                // row的numb是从1计数，这里需要从0
+                const rowNumb = harkArr[0] - 1
+                const pushRow = this.photoData[rowNumb]
+                const pushRowList = pushRow.list
+                pushRowList.push(userData)
+                const pushRowLen = pushRowList.length
+                const pushRowMaxNumb = pushRow.maxNumb
+                const emptyNumb = pushRowMaxNumb - pushRowLen
+                if (emptyNumb === 0) {
+                    console.log('填满了一行', harkArr)
+                    rowRecordDiv.setAttribute('id', `${harkArr[0]}${this.SPLIT_FLAG}1`)
+                    // 一行处理完毕，换一行处理
+                    // 防止setAttribute id 还没有映射到dom，所以起一个setTimeout
+                    this.$nextTick(()=> {
+                        this._pollingParticipantRecordsParser(listData)
+                    })
+                    return
+                }
+                // 上面是响应式更新数据，需要等dom填充
+                this.$nextTick(() => {
+                    const imagesBox = rowRecordDiv.childNodes
+                    rowRecordDiv = null
+                    const len = imagesBox.length
+                    // console.log('pushRowList.length', pushRowLen, pushRowMaxNumb, emptyNumb)
+                    this._pasePollingParticipantRecords(imagesBox[len - 1], () => {
+                        // 递归调用，知道本次拿到的后台更新记录处理完毕
+                        this._pollingParticipantRecordsParser(listData)
+                    })
+                })
             },
             _pollingParticipantRecords() {
                 // TODO 需要修改成 setInterval
@@ -407,42 +459,7 @@
                         console.warn('没有参会记录数据需要处理')
                         return
                     }
-                    const amiItem = listData.shift()
-                    console.log('本次需要处理的动画记录', amiItem)
-                    // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
-                    this.REQ_participantQuery_currentIndex = amiItem.id
-                    console.log('轮询更新REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
-
-                    // 先更新响应数据，拿到最新的一个img dom
-                    const rowRecord = this._getNoFullRowDiv()
-                    let {
-                        rowRecordDiv,
-                        rowRecordDivId,
-                        harkArr,
-                    } = rowRecord
-                    console.log(rowRecordDiv, rowRecordDivId, harkArr)
-                    // row的numb是从1计数，这里需要从0
-                    const rowNumb = harkArr[0] - 1
-                    console.log('rowNumb', rowNumb)
-                    const pushRow = this.photoData[rowNumb]
-                    const pushRowList = pushRow.list
-                    console.log('pushRowList.length', pushRowList.length)
-                    pushRowList.push(amiItem)
-                    const pushRowLen = pushRowList.length
-                    const pushRowMaxNumb = pushRow.maxNumb
-                    const emptyNumb = pushRowMaxNumb - pushRowLen
-                    if (emptyNumb === 0) {
-                        console.log('填满了一行', harkArr)
-                        rowRecordDiv.setAttribute('id', `${harkArr[0]}${this.SPLIT_FLAG}1`)
-                        rowRecordDiv = null
-                    }
-                    // 上面是响应式更新数据，需要等dom填充
-                    this.$nextTick(() => {
-                        const imagesBox = rowRecordDiv.childNodes
-                        const len = imagesBox.length
-                        // console.log('pushRowList.length', pushRowLen, pushRowMaxNumb, emptyNumb)
-                        this._pasePollingParticipantRecords(imagesBox[len - 1])
-                    })
+                    this._pollingParticipantRecordsParser(listData)
                 }).catch(err => {
                     console.error('轮询参会记录出错', err)
                 })
