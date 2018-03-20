@@ -1,6 +1,6 @@
 <template>
     <div class="photo-item" :style="{marginLeft: marginLeft+'px'}">
-        <img v-lazy="imgUrl">
+        <img v-lazy="imgUrl" :id="'user-'+userid">
     </div>
 </template>
 
@@ -12,6 +12,11 @@
                 type: String,
                 required: true,
                 default: '../../public/img/lazy_defult_img.png'
+            },
+            // 用户id
+            userid: {
+                type: Number,
+                required: true
             },
             name: {
                 type: String,

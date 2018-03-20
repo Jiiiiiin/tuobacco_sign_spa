@@ -3,6 +3,7 @@
         <we-chat-sign-photo-item
                 :img-url="item.headimgurl"
                 :name="item.username"
+                :userid="item.id"
                 :marginLeft="item.marginLeft"
                 v-for="item in itemData"
                 :key="item.id"></we-chat-sign-photo-item>

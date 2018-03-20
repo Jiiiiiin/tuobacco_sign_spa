@@ -1,5 +1,6 @@
 <template>
     <div class="wechat-sign-tobacco">
+        <!--TOOD-->
         <!--<div class="item-logo">-->
         <!--<img class="logo-img" v-lazy="logoBg" alt="云南中烟">-->
         <!--</div>-->
@@ -31,16 +32,24 @@
                 <img v-lazy="lotteryBtn" alt="点击抽奖" @click="onLotteryBtnTap">
             </div>
         </div>
+        <el-badge value="host" class="show-recods" @click="onTapQryRecods">
+            <el-button size="small">查看记录</el-button>
+        </el-badge>
     </div>
 </template>
 
 <script type="text/ecmascript-6">
     import WeChatSignPhotoItem from './WeChatSignPhotoItem.vue'
     import WeChatSignPhotoItemBox from './WeChatSignPhotoItemBox.vue'
-    import {Message} from 'element-ui';
+    import {Notification, Badge, Button} from 'element-ui'
+    import Vue from 'vue'
+
+    Vue.component(Badge.name, Badge)
+    Vue.component(Button.name, Button)
 
     // 1标识已经加载完毕， 0标识还可以填充
     const ISFULL = 1
+    const ERR_DIALOG_TITLE = '开小差了'
 
     export default {
         name: 'HelloWorld',
@@ -76,7 +85,7 @@
                 REQ_meetingDraw: '',
                 itemLotteryRecord: [],
                 lotteryBtn: `${this.$vp.options.appUrl}/img/lottery-btn.png`,
-                yeBg: `${this.$vp.options.appUrl}/img/ye-bg.jpg`,
+                yeBg: `${this.$vp.options.appUrl}/img/ye-bg.png`,
                 logoBg: `${this.$vp.options.appUrl}/img/logo-ty.png`,
                 photoData: [
                     {
@@ -85,16 +94,6 @@
                         marginLeft: 206,
                         marginTop: 0,
                         list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            }
                         ]
                     },
                     {
@@ -146,58 +145,19 @@
                         marginTop: 12,
                         list: []
                     },
+                    // 第9行需要特殊处理，第[5]位的item需要设置【marginLeft: 138】
                     {
                         id: 9,
-                        maxNumb: 11,
+                        maxNumb: 12,
                         marginLeft: 282,
                         marginTop: 17,
                         list: [
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 1
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 2
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 3
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 4
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 5
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 6,
-                                marginLeft: 138
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 7
-                            },
-                            {
-                                headimgurl: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3470587276,2545738327&fm=27&gp=0.jpg',
-                                username: '张三',
-                                id: 8
-                            }
                         ]
                     },
+                    // 第10行需要特殊处理，第[9]位的item需要设置【marginLeft: xxx】
                     {
                         id: 10,
-                        maxNumb: 9,
+                        maxNumb: 16,
                         marginLeft: 250,
                         marginTop: 15,
                         list: []
@@ -211,7 +171,7 @@
                     },
                     {
                         id: 12,
-                        maxNumb: 11,
+                        maxNumb: 13,
                         marginLeft: 232,
                         marginTop: 9,
                         list: []
@@ -223,8 +183,7 @@
                         marginTop: 12,
                         list: []
                     }
-
-                ],
+                ]
             }
         },
         methods: {
@@ -232,20 +191,36 @@
             onLotteryBtnTap() {
                 this.$vp.ajaxGet(this.REQ_meetingDraw, {
                     params: {drawNum: 1}
-                }).then(weInfo => {
+                }).then(res => {
                     // 这个是如果后台返回的是全量记录，同样可以达到目的
                     // this._paseWinningRecordData(res)
                     // 下面的是老接口 同步返回一个中奖用户的情况
-                    const len = this.itemLotteryRecord.length
-                    for (let i = 0; i < len; i++) {
-                        let oldItem = this.itemLotteryRecord[i]
-                        if (oldItem.hashData) {
-                            continue
+                    if (res && res.List && res.List.length === 1) {
+                        const weInfo = res.List[0]
+                        const len = this.itemLotteryRecord.length
+                        for (let i = 0; i < len; i++) {
+                            let oldItem = this.itemLotteryRecord[i]
+                            if (oldItem.hashData) {
+                                continue
+                            }
+                            oldItem.hashData = true
+                            this.itemLotteryRecord[i] = {...oldItem, ...weInfo}
+                            // 服务端只会返回一条记录
+                            break
                         }
-                        oldItem.hashData = true
-                        this.itemLotteryRecord[i] = {...oldItem, ...weInfo}
+                    } else {
+                        Notification.error({
+                            title: ERR_DIALOG_TITLE,
+                            message: '服务端没有返回正确的中奖纪录'
+                        })
                     }
                 })
+            },
+            /**
+             * 点击查询记录
+             */
+            onTapQryRecods() {
+                // TODO 调到下一个页面查询
             },
             // 处理中奖纪录
             _paseWinningRecordData(res) {
@@ -255,7 +230,8 @@
                     let oldItem = this.itemLotteryRecord[i]
                     oldItem.hashData = true
                     let weInfo = data[i]
-                    this.itemLotteryRecord[i] = {...oldItem, ...weInfo}
+                    const mergeWeInfoData = {...oldItem, ...weInfo}
+                    this.$set(this.itemLotteryRecord, i, mergeWeInfoData)
                 }
             },
             _initItemLotteryRecordArr() {
@@ -272,10 +248,20 @@
              * @param popNumb 需要补充的数量
              * @private
              */
-            _popData2ArryByNumb(arr, popNumb, originArr) {
+            _popData2ArryByNumb(arr, popNumb) {
                 // 直接返回在插入，vue不会把新插入的数据作为响应式数据
                 // 后台返回的数据是，最先参加的人排在数组的最后
                 return arr.splice(0, popNumb)
+            },
+            _handler89RowMargin(popArrData, idx){
+                if(idx === 8){
+                    let item = popArrData[4]
+                    popArrData[4] = {...item, ...{marginLeft: 158}}
+                } else if(idx === 9){
+                    let item = popArrData[10]
+                    popArrData[10] = {...item, ...{marginLeft: 68}}
+                }
+
             },
             /**
              * 处理查询回来的参会记录
@@ -285,8 +271,6 @@
              * @private
              */
             _paseParticipantRecords(res, isNoAni, aniHandlerFun) {
-                // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
-                // this.REQ_participantQuery_currentIndex
                 if (!res) {
                     Message.warning({
                         message: '现在还木有人签到哦，不然我们的服务器怎么会不返回数据呢？'
@@ -299,15 +283,16 @@
                     console.warn('没有参会记录数据需要处理')
                     return
                 }
-                console.error('获取到的签到记录', listData)
+                // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
+                this.REQ_participantQuery_currentIndex = listData[listData.length - 1].id
+                console.log('REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
                 let participantRecord = document.getElementsByClassName('participantRecord')
                 const len = participantRecord.length
                 for (let i = 0; i < len; i++) {
                     let rowRecordDiv = participantRecord[i]
-                    const harkVal = rowRecordDiv.getAttribute('id')
-                    rowRecordDiv = null
+                    const harkArr = rowRecordDiv.getAttribute('id').split(',')
                     // 格式：1hack,0 rowRecordDiv -》 [itemid]xxx,0(1标识已经加载完毕， 0标识还可以填充)
-                    const isFull = harkVal.split(',')[1] === ISFULL
+                    const isFull = harkArr[1] === ISFULL
                     if (isFull) {
                         // 当前这一行已经填满，那么就调到下一行，进行检查
                         continue
@@ -321,11 +306,28 @@
                         if (isNoAni) {
                             // vue 数据侦测https://cn.vuejs.org/v2/guide/list.html#%E6%95%B0%E7%BB%84%E6%9B%B4%E6%96%B0%E6%A3%80%E6%B5%8B
                             const popArrData = this._popData2ArryByNumb(listData, emptyNumb, pushRowList)
+                            if(i === 8 || i === 9){
+                                this._handler89RowMargin(popArrData, i)
+                            }
                             this.photoData[i].list = [...pushRowList, ...popArrData]
+                            const newRowList = this.photoData[i].list
+                            const updatedLen = newRowList.length
+                            // 更新dom上面使用id绑定的【标识】，标识填充完毕
+                            // :id="item.id+'hack,'+(item.maxNumb === item.list.length ? 1 : 0)"
+                            rowRecordDiv.setAttribute('id', `${harkArr[0]},${pushRowMaxNumb === updatedLen ? 1 : 0}`)
+                            rowRecordDiv = null
+                            // 查询回来的结果pop完毕之后，就退出循环
+                            if (listData.length == 0) {
+                                break
+                            }
+                        } else {
+                            setTimeout(() => {
+                                this::aniHandlerFun(pushRowList, listData.pop(), rowRecordDiv)
+                                // 动画在这个时间内完成
+                            }, 30000)
                         }
                         continue
                     }
-
                 }
                 // 释放dom引用
                 participantRecord = null
@@ -341,7 +343,7 @@
                     // 放在这里防止两个方法同时处理一个响应数据导致问题（未测试）
                     this._pollingParticipantRecords()
                 }).catch(err => {
-                    console.error('_loadParticipantRecords', err)
+                    console.error('查询所有参会记录 _loadParticipantRecords 出错', err)
                     // 无论初始化获取记录是否成功都开启轮询监控
                     this._pollingParticipantRecords()
                 })
@@ -349,22 +351,24 @@
             _pollingParticipantRecords() {
                 setTimeout(() => {
                     console.log('准备轮询')
-                    // this.$vp.ajaxGet(this.REQ_participantQuery, {
-                    //     params: {
-                    //         currentIndex: this.REQ_participantQuery_currentIndex
-                    //     }
-                    // }).then(res => {
-                    //     this._paseParticipantRecords(res, false, () => {
-                    //         // 这里处理动画逻辑
-                    //     })
-                    // }).catch(err => {
-                    //     console.error('轮询参会记录出错', err)
-                    // })
+                    this.$vp.ajaxGet(this.REQ_participantQuery, {
+                        params: {
+                            currentIndex: this.REQ_participantQuery_currentIndex
+                        }
+                    }).then(res => {
+                        this._paseParticipantRecords(res, false, (pushRowList, listDataPopItem, rowRecordDiv) => {
+                            // 这里处理动画逻辑
+
+                        })
+                    }).catch(err => {
+                        console.error('轮询参会记录出错', err)
+                    })
                 }, 10000)
             },
             // 加载微信与会人员数据，在页面初始化的时候执行
             _loadWeChartDataOnPageCreated() {
-                this._loadParticipantRecords()
+                // TODO 测试轮询注释
+                // this._loadParticipantRecords()
             },
             // 加载中奖数据, 中奖纪录查询
             _loadLotteryRecordData() {
@@ -395,6 +399,10 @@
         bottom: 0
         width 100%
         background-color: #7a0402
+        .show-recods
+            position absolute
+            bottom: 5%;
+            left: 3%;
         .item-logo
             position: absolute;
             top: 0;

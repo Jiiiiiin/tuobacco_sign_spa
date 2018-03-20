@@ -8,6 +8,7 @@ import VueLazyload from 'vue-lazyload'
 import plugins from './store/plugins'
 import {Loading} from 'element-ui';
 import './assets/styl/index.styl'
+import { Notification } from 'element-ui';
 
 Vue.use(Vuex)
 
@@ -60,7 +61,7 @@ Vue.use(ViewPlus, {
         msgKey: 'ReturnMessage',
         defShowLoading: false,
         onReqErrPaserMsg: (response, errMsg) => {
-            return `${errMsg} [服务端]`
+            return `${errMsg} [程序员开小差了]`
         },
         loading(_showLoading) {
             if (_showLoading) {
@@ -74,8 +75,11 @@ Vue.use(ViewPlus, {
                 }, 0)
             }
         },
-        errDialog(content = '错误消息未定义') {
-            alert(content)
+        errDialog(message = '错误消息未定义') {
+            Notification.warning({
+                title: '我们的服务器出现了一点小差了，请稍后尝试',
+                message
+            })
             return this
         }
     }
