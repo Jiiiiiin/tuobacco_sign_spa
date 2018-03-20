@@ -1,6 +1,6 @@
 <template>
     <div class="photo-item" :style="{marginLeft: marginLeft+'px'}">
-        <img v-lazy="imgUrl" :id="'user-'+userid">
+        <img v-lazy="imgUrl" :id="'user-'+userid" class="photo-item-img">
     </div>
 </template>
 
@@ -36,7 +36,8 @@
         height 24px
         float: left
         margin-right 4px
-        img
+        .photo-item-img
+            display block
             width 22px
             height 22px
             margin: 1px 1px 0

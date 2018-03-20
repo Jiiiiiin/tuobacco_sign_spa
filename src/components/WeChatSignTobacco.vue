@@ -15,7 +15,7 @@
                             :margin-left="item.marginLeft"
                             :margin-top="item.marginTop"
                             class="participantRecord"
-                            :id="item.id+'hack,'+(item.maxNumb === item.list.length ? 1 : 0)">
+                            :id="item.id+'H'+(item.maxNumb === item.list.length ? 1 : 0)">
                         <!--1标识已经加载完毕， 0标识还可以填充-->
                     </we-chat-sign-photo-item-box>
                 </div>
@@ -43,6 +43,7 @@
     import WeChatSignPhotoItemBox from './WeChatSignPhotoItemBox.vue'
     import {Notification, Badge, Button} from 'element-ui'
     import Vue from 'vue'
+    import Zoomerang from 'zoomerang'
 
     Vue.component(Badge.name, Badge)
     Vue.component(Button.name, Button)
@@ -93,8 +94,7 @@
                         maxNumb: 8,
                         marginLeft: 206,
                         marginTop: 0,
-                        list: [
-                        ]
+                        list: []
                     },
                     {
                         id: 2,
@@ -151,8 +151,7 @@
                         maxNumb: 12,
                         marginLeft: 282,
                         marginTop: 17,
-                        list: [
-                        ]
+                        list: []
                     },
                     // 第10行需要特殊处理，第[9]位的item需要设置【marginLeft: xxx】
                     {
@@ -253,11 +252,11 @@
                 // 后台返回的数据是，最先参加的人排在数组的最后
                 return arr.splice(0, popNumb)
             },
-            _handler89RowMargin(popArrData, idx){
-                if(idx === 8){
+            _handler89RowMargin(popArrData, idx) {
+                if (idx === 8) {
                     let item = popArrData[4]
                     popArrData[4] = {...item, ...{marginLeft: 158}}
-                } else if(idx === 9){
+                } else if (idx === 9) {
                     let item = popArrData[10]
                     popArrData[10] = {...item, ...{marginLeft: 68}}
                 }
@@ -290,8 +289,10 @@
                 const len = participantRecord.length
                 for (let i = 0; i < len; i++) {
                     let rowRecordDiv = participantRecord[i]
-                    const harkArr = rowRecordDiv.getAttribute('id').split(',')
-                    // 格式：1hack,0 rowRecordDiv -》 [itemid]xxx,0(1标识已经加载完毕， 0标识还可以填充)
+                    const rowRecordDivId = rowRecordDiv.getAttribute('id')
+                    console.log('rowRecordDivId', rowRecordDivId)
+                    const harkArr = rowRecordDivId.split('H')
+                    // 格式：1H0 rowRecordDiv -》 [itemid]H0(1标识已经加载完毕， 0标识还可以填充)
                     const isFull = harkArr[1] === ISFULL
                     if (isFull) {
                         // 当前这一行已经填满，那么就调到下一行，进行检查
@@ -306,7 +307,7 @@
                         if (isNoAni) {
                             // vue 数据侦测https://cn.vuejs.org/v2/guide/list.html#%E6%95%B0%E7%BB%84%E6%9B%B4%E6%96%B0%E6%A3%80%E6%B5%8B
                             const popArrData = this._popData2ArryByNumb(listData, emptyNumb, pushRowList)
-                            if(i === 8 || i === 9){
+                            if (i === 8 || i === 9) {
                                 this._handler89RowMargin(popArrData, i)
                             }
                             this.photoData[i].list = [...pushRowList, ...popArrData]
@@ -314,16 +315,44 @@
                             const updatedLen = newRowList.length
                             // 更新dom上面使用id绑定的【标识】，标识填充完毕
                             // :id="item.id+'hack,'+(item.maxNumb === item.list.length ? 1 : 0)"
-                            rowRecordDiv.setAttribute('id', `${harkArr[0]},${pushRowMaxNumb === updatedLen ? 1 : 0}`)
+                            rowRecordDiv.setAttribute('id', `${harkArr[0]}H${pushRowMaxNumb === updatedLen ? 1 : 0}`)
                             rowRecordDiv = null
+
+                            // TODO 测试动画
+                            if (i === len - 1) {
+                                console.log('updatedLen,', updatedLen, rowRecordDivId)
+                                let itemDiv = null
+                                Zoomerang.config({
+                                    bgColor: '#000',
+                                    bgOpacity: 0.5,
+                                    deepCopy: true,
+                                    onClose() {
+                                        itemDiv.style.transform = ''
+                                        console.log('arguments', arguments)
+                                    }
+                                })
+
+                                this.$nextTick(()=>{
+                                    // 找到row对应的动态添加的一个dom
+                                    // https://yyx990803.github.io/zoomerang/
+                                    let item = document.getElementsByClassName('photo-item-img');
+                                    itemDiv = item[item.length -1]
+                                    Zoomerang.listen(itemDiv)
+                                    // Zoomerang.close(()=>{
+                                    //     console.log('arguments', arguments)
+                                    // })
+                                    itemDiv.click()
+                                })
+                            }
+
                             // 查询回来的结果pop完毕之后，就退出循环
                             if (listData.length == 0) {
                                 break
                             }
                         } else {
                             setTimeout(() => {
-                                this::aniHandlerFun(pushRowList, listData.pop(), rowRecordDiv)
-                                // 动画在这个时间内完成
+                                // this::aniHandlerFun(pushRowList, listData.pop(), rowRecordDiv)
+                                pushRowList.push(listData.pop())
                             }, 30000)
                         }
                         continue
@@ -349,26 +378,27 @@
                 })
             },
             _pollingParticipantRecords() {
-                setTimeout(() => {
-                    console.log('准备轮询')
-                    this.$vp.ajaxGet(this.REQ_participantQuery, {
-                        params: {
-                            currentIndex: this.REQ_participantQuery_currentIndex
-                        }
-                    }).then(res => {
-                        this._paseParticipantRecords(res, false, (pushRowList, listDataPopItem, rowRecordDiv) => {
-                            // 这里处理动画逻辑
-
-                        })
-                    }).catch(err => {
-                        console.error('轮询参会记录出错', err)
-                    })
-                }, 10000)
+                // TODO 需要修改成 setInterval
+                // setTimeout(() => {
+                //     console.log('准备轮询')
+                //     this.$vp.ajaxGet(this.REQ_participantQuery, {
+                //         params: {
+                //             currentIndex: this.REQ_participantQuery_currentIndex
+                //         }
+                //     }).then(res => {
+                //         this._paseParticipantRecords(res, false, (pushRowList, listDataPopItem, rowRecordDiv) => {
+                //             // 这里处理动画逻辑
+                //             // pushRowList
+                //         })
+                //     }).catch(err => {
+                //         console.error('轮询参会记录出错', err)
+                //     })
+                // }, 10000)
             },
             // 加载微信与会人员数据，在页面初始化的时候执行
             _loadWeChartDataOnPageCreated() {
                 // TODO 测试轮询注释
-                // this._loadParticipantRecords()
+                this._loadParticipantRecords()
             },
             // 加载中奖数据, 中奖纪录查询
             _loadLotteryRecordData() {
