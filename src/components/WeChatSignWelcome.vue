@@ -12,6 +12,9 @@
 
 <script type="text/ecmascript-6">
     import qs from 'qs'
+    import {Notification} from 'element-ui'
+
+    const ERR_DIALOG_TITLE = '开小差了'
 
     export default {
         name: 'WeChatSignWelcome',
@@ -24,18 +27,28 @@
             }
         },
         created() {
-            const _urlParams = ((_temp) => {
-                return _temp ? qs.parse(_temp.substring(1, _temp.length)) : null
-            })(window.location.search)
-            console.log('_urlParams', _urlParams, window.location.search)
-            if(!_urlParams || _urlParams === null){
-                this.$router.push({ name: 'Error'})
-            } else {
-                this.meetingId = _urlParams.meetingId
-                this.sessionId = _urlParams.sessionId
-                this.mainUrl = `/WeChatSignTobacco/${this.meetingId}/${this.sessionId}`
-            }
+
         },
+        mounted(){
+            // const _urlParams = ((_temp) => {
+            //     return _temp ? qs.parse(_temp.substring(1, _temp.length)) : null
+            // })(window.location.search)
+            // this.meetingId = _urlParams.meetingId
+            // this.sessionId = _urlParams.sessionId
+
+            if(this.$route.params && this.$vp.utilObjHasVal(this.$route.params)) {
+                this.meetingId = this.$route.params.meetingId
+                this.sessionId = this.$route.params.sessionId
+                this.mainUrl = `/WeChatSignTobacco/${this.meetingId}/${this.sessionId}`
+            } else {
+                Notification.error({
+                    title: ERR_DIALOG_TITLE,
+                    message: '您没有正确进入本会场预设的链接，请联系相关技术人员给予解决。',
+                    duration: 5000
+                })
+            }
+            console.log('this.$route.params', this.$route.params)
+        }
     }
 </script>
 

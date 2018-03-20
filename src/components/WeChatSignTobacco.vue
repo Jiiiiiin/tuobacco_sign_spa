@@ -1,6 +1,5 @@
 <template>
     <div class="wechat-sign-tobacco">
-        <!--TOOD-->
         <!--<div class="item-logo">-->
         <!--<img class="logo-img" v-lazy="logoBg" alt="云南中烟">-->
         <!--</div>-->
@@ -15,7 +14,7 @@
                             :margin-left="item.marginLeft"
                             :margin-top="item.marginTop"
                             class="participantRecord"
-                            :id="item.id+'H'+(item.maxNumb === item.list.length ? 1 : 0)">
+                            :id="item.id+SPLIT_FLAG+(item.maxNumb === item.list.length ? 1 : 0)">
                         <!--1标识已经加载完毕， 0标识还可以填充-->
                     </we-chat-sign-photo-item-box>
                 </div>
@@ -41,7 +40,7 @@
 <script type="text/ecmascript-6">
     import WeChatSignPhotoItem from './WeChatSignPhotoItem.vue'
     import WeChatSignPhotoItemBox from './WeChatSignPhotoItemBox.vue'
-    import {Notification, Badge, Button} from 'element-ui'
+    import {Message, Notification, Badge, Button} from 'element-ui'
     import Vue from 'vue'
     import Zoomerang from 'zoomerang'
 
@@ -60,6 +59,7 @@
         },
         data() {
             return {
+                SPLIT_FLAG: '-',
                 /**
                  * 中奖纪录查询
                  * @param meetingId
@@ -265,15 +265,14 @@
             /**
              * 处理查询回来的参会记录
              * @param res
-             * @param isNoAni 是否不需要动画处理，一般初始化页面的时候穿true，轮询的时候穿false，并实现下面的回调
-             * @aniHandlerFun 如果需要进行动画处理，会回调该函数，由调用方自己去处理这块逻辑
              * @private
              */
-            _paseParticipantRecords(res, isNoAni, aniHandlerFun) {
-                if (!res) {
-                    Message.warning({
-                        message: '现在还木有人签到哦，不然我们的服务器怎么会不返回数据呢？'
-                    });
+            _paseParticipantRecords(res) {
+                if (!res || !res.List) {
+                    Notification.error({
+                        title: ERR_DIALOG_TITLE,
+                        message: '服务端没有返回正确的与会纪录'
+                    })
                     return
                 }
                 // 1.先判断哪一行空着
@@ -290,8 +289,7 @@
                 for (let i = 0; i < len; i++) {
                     let rowRecordDiv = participantRecord[i]
                     const rowRecordDivId = rowRecordDiv.getAttribute('id')
-                    console.log('rowRecordDivId', rowRecordDivId)
-                    const harkArr = rowRecordDivId.split('H')
+                    const harkArr = rowRecordDivId.split(this.SPLIT_FLAG)
                     // 格式：1H0 rowRecordDiv -》 [itemid]H0(1标识已经加载完毕， 0标识还可以填充)
                     const isFull = harkArr[1] === ISFULL
                     if (isFull) {
@@ -304,56 +302,21 @@
                         const pushRowLen = pushRowList.length
                         const pushRowMaxNumb = pushRow.maxNumb
                         const emptyNumb = pushRowMaxNumb - pushRowLen
-                        if (isNoAni) {
-                            // vue 数据侦测https://cn.vuejs.org/v2/guide/list.html#%E6%95%B0%E7%BB%84%E6%9B%B4%E6%96%B0%E6%A3%80%E6%B5%8B
-                            const popArrData = this._popData2ArryByNumb(listData, emptyNumb, pushRowList)
-                            if (i === 8 || i === 9) {
-                                this._handler89RowMargin(popArrData, i)
-                            }
-                            this.photoData[i].list = [...pushRowList, ...popArrData]
-                            const newRowList = this.photoData[i].list
-                            const updatedLen = newRowList.length
-                            // 更新dom上面使用id绑定的【标识】，标识填充完毕
-                            // :id="item.id+'hack,'+(item.maxNumb === item.list.length ? 1 : 0)"
-                            rowRecordDiv.setAttribute('id', `${harkArr[0]}H${pushRowMaxNumb === updatedLen ? 1 : 0}`)
-                            rowRecordDiv = null
-
-                            // TODO 测试动画
-                            if (i === len - 1) {
-                                console.log('updatedLen,', updatedLen, rowRecordDivId)
-                                let itemDiv = null
-                                Zoomerang.config({
-                                    bgColor: '#000',
-                                    bgOpacity: 0.5,
-                                    deepCopy: true,
-                                    onClose() {
-                                        itemDiv.style.transform = ''
-                                        console.log('arguments', arguments)
-                                    }
-                                })
-
-                                this.$nextTick(()=>{
-                                    // 找到row对应的动态添加的一个dom
-                                    // https://yyx990803.github.io/zoomerang/
-                                    let item = document.getElementsByClassName('photo-item-img');
-                                    itemDiv = item[item.length -1]
-                                    Zoomerang.listen(itemDiv)
-                                    // Zoomerang.close(()=>{
-                                    //     console.log('arguments', arguments)
-                                    // })
-                                    itemDiv.click()
-                                })
-                            }
-
-                            // 查询回来的结果pop完毕之后，就退出循环
-                            if (listData.length == 0) {
-                                break
-                            }
-                        } else {
-                            setTimeout(() => {
-                                // this::aniHandlerFun(pushRowList, listData.pop(), rowRecordDiv)
-                                pushRowList.push(listData.pop())
-                            }, 30000)
+                        // vue 数据侦测https://cn.vuejs.org/v2/guide/list.html#%E6%95%B0%E7%BB%84%E6%9B%B4%E6%96%B0%E6%A3%80%E6%B5%8B
+                        const popArrData = this._popData2ArryByNumb(listData, emptyNumb, pushRowList)
+                        if (i === 8 || i === 9) {
+                            this._handler89RowMargin(popArrData, i)
+                        }
+                        this.photoData[i].list = [...pushRowList, ...popArrData]
+                        const newRowList = this.photoData[i].list
+                        const updatedLen = newRowList.length
+                        // 更新dom上面使用id绑定的【标识】，标识填充完毕
+                        // :id="item.id+'hack,'+(item.maxNumb === item.list.length ? 1 : 0)"
+                        rowRecordDiv.setAttribute('id', `${harkArr[0]}H${pushRowMaxNumb === updatedLen ? 1 : 0}`)
+                        rowRecordDiv = null
+                        // 查询回来的结果pop完毕之后，就退出循环
+                        if (listData.length == 0) {
+                            break
                         }
                         continue
                     }
@@ -368,7 +331,7 @@
                         currentIndex: this.REQ_participantQuery_currentIndex
                     }
                 }).then(res => {
-                    this._paseParticipantRecords(res, true)
+                    this._paseParticipantRecords(res)
                     // 放在这里防止两个方法同时处理一个响应数据导致问题（未测试）
                     this._pollingParticipantRecords()
                 }).catch(err => {
@@ -377,28 +340,119 @@
                     this._pollingParticipantRecords()
                 })
             },
+            // 返回还在空着的 row div infos
+            _getNoFullRowDiv() {
+                let participantRecord = document.getElementsByClassName('participantRecord')
+                const len = participantRecord.length
+                for (let i = 0; i < len; i++) {
+                    let rowRecordDiv = participantRecord[i]
+                    const rowRecordDivId = rowRecordDiv.getAttribute('id')
+                    const harkArr = rowRecordDivId.split(this.SPLIT_FLAG)
+                    // 格式：1H0 rowRecordDiv -》 [itemid]H0(1标识已经加载完毕， 0标识还可以填充)
+                    const isFull = harkArr[1] === ISFULL
+                    if (isFull) {
+                        // 当前这一行已经填满，那么就调到下一行，进行检查
+                        continue
+                    } else {
+                        return {
+                            rowRecordDiv,
+                            rowRecordDivId,
+                            harkArr,
+                        }
+                    }
+                }
+                // 释放dom引用
+                participantRecord = null
+            },
+            _pasePollingParticipantRecords(amiItem) {
+                // 延迟执行以便先看到头像被放入叶子
+                setTimeout(() => {
+                    // 这里处理动画逻辑
+                    Zoomerang.config({
+                        bgColor: '#000',
+                        bgOpacity: 0.5,
+                        deepCopy: true,
+                        onClose(closeItemDom) {
+                            closeItemDom.style.transform = ''
+                        }
+                    })
+                    // 找到row对应的动态添加的一个dom
+                    // https://yyx990803.github.io/zoomerang/
+                    Zoomerang.listen(amiItem)
+                    amiItem.click()
+                    // 设置自动关闭
+                    setTimeout(() => {
+                        amiItem.click()
+                    }, 3000)
+                }, 800)
+            },
             _pollingParticipantRecords() {
                 // TODO 需要修改成 setInterval
                 // setTimeout(() => {
-                //     console.log('准备轮询')
-                //     this.$vp.ajaxGet(this.REQ_participantQuery, {
-                //         params: {
-                //             currentIndex: this.REQ_participantQuery_currentIndex
-                //         }
-                //     }).then(res => {
-                //         this._paseParticipantRecords(res, false, (pushRowList, listDataPopItem, rowRecordDiv) => {
-                //             // 这里处理动画逻辑
-                //             // pushRowList
-                //         })
-                //     }).catch(err => {
-                //         console.error('轮询参会记录出错', err)
-                //     })
-                // }, 10000)
+                console.log('准备轮询')
+                this.$vp.ajaxGet(this.REQ_participantQuery, {
+                    params: {
+                        currentIndex: this.REQ_participantQuery_currentIndex
+                    }
+                }).then(res => {
+                    if (!res || !res.List) {
+                        Notification.error({
+                            title: ERR_DIALOG_TITLE,
+                            message: '服务端没有返回正确的与会纪录'
+                        })
+                    }
+                    // 1.先判断哪一行空着
+                    const listData = res.List
+                    if (listData && listData.length <= 0) {
+                        console.warn('没有参会记录数据需要处理')
+                        return
+                    }
+                    const amiItem = listData.shift()
+                    console.log('本次需要处理的动画记录', amiItem)
+                    // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
+                    this.REQ_participantQuery_currentIndex = amiItem.id
+                    console.log('轮询更新REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
+
+                    // 先更新响应数据，拿到最新的一个img dom
+                    const rowRecord = this._getNoFullRowDiv()
+                    let {
+                        rowRecordDiv,
+                        rowRecordDivId,
+                        harkArr,
+                    } = rowRecord
+                    console.log(rowRecordDiv, rowRecordDivId, harkArr)
+                    // row的numb是从1计数，这里需要从0
+                    const rowNumb = harkArr[0] - 1
+                    console.log('rowNumb', rowNumb)
+                    const pushRow = this.photoData[rowNumb]
+                    const pushRowList = pushRow.list
+                    console.log('pushRowList.length', pushRowList.length)
+                    pushRowList.push(amiItem)
+                    const pushRowLen = pushRowList.length
+                    const pushRowMaxNumb = pushRow.maxNumb
+                    const emptyNumb = pushRowMaxNumb - pushRowLen
+                    if (emptyNumb === 0) {
+                        console.log('填满了一行', harkArr)
+                        rowRecordDiv.setAttribute('id', `${harkArr[0]}${this.SPLIT_FLAG}1`)
+                        rowRecordDiv = null
+                    }
+                    // 上面是响应式更新数据，需要等dom填充
+                    this.$nextTick(() => {
+                        const imagesBox = rowRecordDiv.childNodes
+                        const len = imagesBox.length
+                        // console.log('pushRowList.length', pushRowLen, pushRowMaxNumb, emptyNumb)
+                        this._pasePollingParticipantRecords(imagesBox[len - 1])
+                    })
+                }).catch(err => {
+                    console.error('轮询参会记录出错', err)
+                })
+                // }, 1000000)
             },
             // 加载微信与会人员数据，在页面初始化的时候执行
             _loadWeChartDataOnPageCreated() {
                 // TODO 测试轮询注释
-                this._loadParticipantRecords()
+                // this._loadParticipantRecords()
+                this._pollingParticipantRecords()
             },
             // 加载中奖数据, 中奖纪录查询
             _loadLotteryRecordData() {
@@ -416,8 +470,6 @@
             this._initItemLotteryRecordArr()
             this._loadWeChartDataOnPageCreated()
             this._loadLotteryRecordData()
-        },
-        mounted() {
         }
     }
 </script>

@@ -17,8 +17,8 @@ export default new Router({
         {
             path: '/',
             // redirect: { name: 'WeChatSignTobacco'}
-            redirect: {name: 'WeChatSignWelcome'}
-            // redirect: '/Err'
+            // redirect: {name: 'WeChatSignWelcome'}
+            redirect: '/WeChatSignWelcome'
         },
         {
             path: '/WeChatSignWelcome/:meetingId/:sessionId',
