@@ -27,7 +27,7 @@ Vue.use(VueLazyload, {
 })
 
 let loadingInstance = null
-export const BASE_URL = 'http://192.168.3.43:8080'
+export const BASE_URL = 'http://192.168.43.58:8080'
 
 Vue.use(ViewPlus, {
     router,
@@ -51,7 +51,7 @@ Vue.use(ViewPlus, {
     utilHttp: {
         baseURL: BASE_URL,
         // withCredentials: true,
-        timeout: '3000',
+        timeout: '6000',
         headers: {
             Accept: 'application/json, text/plain, */*'
         },

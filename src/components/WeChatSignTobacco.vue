@@ -1,8 +1,8 @@
 <template>
     <div class="wechat-sign-tobacco">
-        <div class="item-logo">
-            <img class="logo-img" v-lazy="logoBg" alt="云南中烟">
-        </div>
+        <!--<div class="item-logo">-->
+        <!--<img class="logo-img" v-lazy="logoBg" alt="云南中烟">-->
+        <!--</div>-->
         <div class="box">
             <div class="item-ye">
                 <div class="ye" v-lazy:background-image="yeBg">
@@ -37,7 +37,7 @@
 <script type="text/ecmascript-6">
     import WeChatSignPhotoItem from './WeChatSignPhotoItem.vue'
     import WeChatSignPhotoItemBox from './WeChatSignPhotoItemBox.vue'
-    import { Message } from 'element-ui';
+    import {Message} from 'element-ui';
 
     // 1标识已经加载完毕， 0标识还可以填充
     const ISFULL = 1
@@ -272,15 +272,22 @@
              * @param popNumb 需要补充的数量
              * @private
              */
-            _popData2ArryByNumb(arr, popNumb) {
+            _popData2ArryByNumb(arr, popNumb, originArr) {
+                // 直接返回在插入，vue不会把新插入的数据作为响应式数据
                 // 后台返回的数据是，最先参加的人排在数组的最后
-
+                return arr.splice(0, popNumb)
             },
-            // 处理查询回来的参会记录
-            _paseParticipantRecords(res) {
+            /**
+             * 处理查询回来的参会记录
+             * @param res
+             * @param isNoAni 是否不需要动画处理，一般初始化页面的时候穿true，轮询的时候穿false，并实现下面的回调
+             * @aniHandlerFun 如果需要进行动画处理，会回调该函数，由调用方自己去处理这块逻辑
+             * @private
+             */
+            _paseParticipantRecords(res, isNoAni, aniHandlerFun) {
                 // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
                 // this.REQ_participantQuery_currentIndex
-                if(!res){
+                if (!res) {
                     Message.warning({
                         message: '现在还木有人签到哦，不然我们的服务器怎么会不返回数据呢？'
                     });
@@ -288,74 +295,76 @@
                 }
                 // 1.先判断哪一行空着
                 const listData = res.List
-                if (listData <= 0) {
+                if (listData && listData.length <= 0) {
                     console.warn('没有参会记录数据需要处理')
                     return
                 }
-                // TODO ! 下面的逻辑好像存在问题
+                console.error('获取到的签到记录', listData)
                 let participantRecord = document.getElementsByClassName('participantRecord')
                 const len = participantRecord.length
                 for (let i = 0; i < len; i++) {
                     let rowRecordDiv = participantRecord[i]
                     const harkVal = rowRecordDiv.getAttribute('id')
+                    rowRecordDiv = null
                     // 格式：1hack,0 rowRecordDiv -》 [itemid]xxx,0(1标识已经加载完毕， 0标识还可以填充)
                     const isFull = harkVal.split(',')[1] === ISFULL
                     if (isFull) {
+                        // 当前这一行已经填满，那么就调到下一行，进行检查
                         continue
                     } else {
                         // 2.找到idx对应的记录
                         const pushRow = this.photoData[i]
-                        const pushRowLen = pushRow.list.length
+                        const pushRowList = pushRow.list
+                        const pushRowLen = pushRowList.length
                         const pushRowMaxNumb = pushRow.maxNumb
                         const emptyNumb = pushRowMaxNumb - pushRowLen
-                        const popArrData = this._popData2ArryByNumb(listData, emptyNumb)
-                        console.log(pushRow.list)
-                        console.log(popArrData)
-                        console.log(emptyNumb)
-                        // for (let i = 0; i < emptyNumb; i++) {
-                        //     // 为了实现动画延迟，一个一个飞进去效果，需要进行迭代
-                        //     // TODO 缺少动画
-                        //     setTimeout(() => {
-                        //         const userData = popArrData.pop()
-                        //         console.log(`用户签到啦，飞啦 ${userData}`)
-                        //         Message.success({
-                        //             message: `用户签到啦，飞啦 ${userData}`,
-                        //         })
-                        //         pushRow.list.push(userData)
-                        //     }, 1000)
-                        // }
+                        if (isNoAni) {
+                            // vue 数据侦测https://cn.vuejs.org/v2/guide/list.html#%E6%95%B0%E7%BB%84%E6%9B%B4%E6%96%B0%E6%A3%80%E6%B5%8B
+                            const popArrData = this._popData2ArryByNumb(listData, emptyNumb, pushRowList)
+                            this.photoData[i].list = [...pushRowList, ...popArrData]
+                        }
+                        continue
                     }
-                    rowRecordDiv = null
+
                 }
                 // 释放dom引用
                 participantRecord = null
-                // const data = res.List
-                // const len = data.length
-                // for (let i = 0; i < len; i++) {
-                //
-                // }
             },
             // 查询所有参会记录
-            _loadAllParticipantRecords() {
+            _loadParticipantRecords() {
                 this.$vp.ajaxGet(this.REQ_participantQuery, {
                     params: {
                         currentIndex: this.REQ_participantQuery_currentIndex
                     }
                 }).then(res => {
-                    this._paseParticipantRecords(res)
+                    this._paseParticipantRecords(res, true)
+                    // 放在这里防止两个方法同时处理一个响应数据导致问题（未测试）
+                    this._pollingParticipantRecords()
+                }).catch(err => {
+                    console.error('_loadParticipantRecords', err)
+                    // 无论初始化获取记录是否成功都开启轮询监控
+                    this._pollingParticipantRecords()
                 })
             },
             _pollingParticipantRecords() {
                 setTimeout(() => {
-                    // 两个接口返回相同数据故在此做处理
-                    // _loadAllParticipantRecords()
                     console.log('准备轮询')
+                    // this.$vp.ajaxGet(this.REQ_participantQuery, {
+                    //     params: {
+                    //         currentIndex: this.REQ_participantQuery_currentIndex
+                    //     }
+                    // }).then(res => {
+                    //     this._paseParticipantRecords(res, false, () => {
+                    //         // 这里处理动画逻辑
+                    //     })
+                    // }).catch(err => {
+                    //     console.error('轮询参会记录出错', err)
+                    // })
                 }, 10000)
             },
             // 加载微信与会人员数据，在页面初始化的时候执行
             _loadWeChartDataOnPageCreated() {
-                this._loadAllParticipantRecords()
-                this._pollingParticipantRecords()
+                this._loadParticipantRecords()
             },
             // 加载中奖数据, 中奖纪录查询
             _loadLotteryRecordData() {
@@ -373,9 +382,6 @@
             this._initItemLotteryRecordArr()
             this._loadWeChartDataOnPageCreated()
             this._loadLotteryRecordData()
-
-            // test
-            this._paseParticipantRecords()
         },
         mounted() {
         }
