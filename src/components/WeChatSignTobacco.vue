@@ -365,6 +365,8 @@
                         }
                     }
                 }
+                // 标示 处理完毕，全部填满
+                return null
                 // 释放dom引用
                 participantRecord = null
             },
@@ -407,6 +409,12 @@
                 // 先更新响应数据，拿到最新的一个img dom
                 let rowRecord = this._getNoFullRowDiv()
                 let rowRecordDiv = rowRecord.rowRecordDiv
+                if(!rowRecordDiv){
+                    // 已经填满
+                    // TODO 结束所有轮询
+                    console.log('叶子装满咯')
+                    return
+                }
                 let harkArr = rowRecord.harkArr
                 // row的numb是从1计数，这里需要从0
                 const rowNumb = harkArr[0] - 1
