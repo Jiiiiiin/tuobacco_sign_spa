@@ -516,8 +516,8 @@
             },
             // 加载微信与会人员数据，在页面初始化的时候执行
             _loadWeChartDataOnPageCreated() {
-                // TODO 测试轮询注释
                 this._loadParticipantRecords()
+                // ！测试轮询才能放开
                 // this._pollingParticipantRecords()
             },
             // 加载中奖数据, 中奖纪录查询
@@ -534,7 +534,7 @@
             this.REQ_participantQuery = `${this.meetingId}/${this.sessionId}/participantQuery`
             this.REQ_meetingDraw = `${this.meetingId}/${this.sessionId}/meetingDraw`
             this._initItemLotteryRecordArr()
-            // this._loadLotteryRecordData()
+            this._loadLotteryRecordData()
             this._loadWeChartDataOnPageCreated()
         }
     }
