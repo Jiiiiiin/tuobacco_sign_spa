@@ -66,6 +66,11 @@
                     duration: 5000
                 })
             }
+        },
+        mounted() {
+            Notification.error({
+                message: '请点击键盘的Enter，即可进入活动主界面，开启统计',
+            })
         }
     }
 </script>
