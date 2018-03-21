@@ -92,64 +92,56 @@
                 photoData: [
                     {
                         id: 1,
-                        maxNumb: 1,
-                        // maxNumb: 8,
+                        maxNumb: 8,
                         marginLeft: 206,
                         marginTop: 0,
                         list: []
                     },
                     {
                         id: 2,
-                        maxNumb: 1,
-                        // maxNumb: 10,
+                        maxNumb: 10,
                         marginLeft: 228,
                         marginTop: 13,
                         list: []
                     },
                     {
                         id: 3,
-                        // maxNumb: 10,
-                        maxNumb: 1,
+                        maxNumb: 10,
                         marginLeft: 248,
                         marginTop: 13,
                         list: []
                     },
                     {
                         id: 4,
-                        // maxNumb: 11,
-                        maxNumb: 1,
+                        maxNumb: 11,
                         marginLeft: 269,
                         marginTop: 8,
                         list: []
                     },
                     {
                         id: 5,
-                        // maxNumb: 12,
-                        maxNumb: 1,
+                        maxNumb: 12,
                         marginLeft: 288,
                         marginTop: 12,
                         list: []
                     },
                     {
                         id: 6,
-                        // maxNumb: 12,
-                        maxNumb: 1,
+                        maxNumb: 12,
                         marginLeft: 318,
                         marginTop: 12,
                         list: []
                     },
                     {
                         id: 7,
-                        // maxNumb: 11,
-                        maxNumb: 1,
+                        maxNumb: 11,
                         marginLeft: 368,
                         marginTop: 12,
                         list: []
                     },
                     {
                         id: 8,
-                        // maxNumb: 11,
-                        maxNumb: 1,
+                        maxNumb: 11,
                         marginLeft: 396,
                         marginTop: 12,
                         list: []
@@ -172,24 +164,21 @@
                     },
                     {
                         id: 11,
-                        // maxNumb: 11,
-                        maxNumb: 1,
+                        maxNumb: 11,
                         marginLeft: 211,
                         marginTop: 12,
                         list: []
                     },
                     {
                         id: 12,
-                        // maxNumb: 13,
-                        maxNumb: 1,
+                        maxNumb: 13,
                         marginLeft: 232,
                         marginTop: 9,
                         list: []
                     },
                     {
                         id: 13,
-                        // maxNumb: 13,
-                        maxNumb: 1,
+                        maxNumb: 13,
                         marginLeft: 221,
                         marginTop: 12,
                         list: []
@@ -279,7 +268,7 @@
              * @param res
              * @private
              */
-            _parseParticipantRecords(res) {
+            _parseParticipantRecords(res, finishCallBack) {
                 if (!res || !res.List) {
                     Notification.error({
                         title: ERR_DIALOG_TITLE,
@@ -298,6 +287,7 @@
                 console.log('REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
                 const participantRecord = document.getElementsByClassName('participantRecord')
                 const len = participantRecord.length
+                let IS_PUSH_FULL_YE = false
                 for (let i = 0; i < len; i++) {
                     let rowRecordDiv = participantRecord[i]
                     const rowRecordDivId = rowRecordDiv.getAttribute('id')
@@ -320,6 +310,14 @@
                         if (i === 8 || i === 9) {
                             this._handler89RowMargin(popArrData, i)
                         }
+                        console.log(i, 'i', emptyNumb)
+                        if (i === 12) {
+                            // 第13行，共有13个座位
+                            if ((pushRowMaxNumb - popArrData.length) === 0) {
+                                IS_PUSH_FULL_YE = true
+                                console.log('两片叶子预设的位子已经被全部填满')
+                            }
+                        }
                         this.photoData[i].list = [...pushRowList, ...popArrData]
                         const newRowList = this.photoData[i].list
                         const updatedLen = newRowList.length
@@ -331,9 +329,9 @@
                         if (listData.length == 0) {
                             break
                         }
-                        continue
                     }
                 }
+                finishCallBack(IS_PUSH_FULL_YE)
             },
             // 查询所有参会记录
             _loadParticipantRecords() {
@@ -342,13 +340,21 @@
                         currentIndex: this.REQ_participantQuery_currentIndex
                     }
                 }).then(res => {
-                    this._parseParticipantRecords(res)
-                    // 放在这里防止两个方法同时处理一个响应数据导致问题（未测试）
-                    this._pollingParticipantRecords()
-                }).catch(err => {
-                    console.error('查询所有参会记录 _loadParticipantRecords 出错', err)
-                    // 无论初始化获取记录是否成功都开启轮询监控
-                    this._pollingParticipantRecords()
+                    this._parseParticipantRecords(res, (isPushFull) => {
+                        if (!isPushFull) {
+                            console.log('初次加载处理完毕，没有填满，回调开启轮询')
+                            setTimeout(() => {
+                                // 放在这里防止两个方法同时处理一个响应数据导致问题（未测试）
+                                this._pollingParticipantRecords()
+                            }, 1000)
+                        }
+                    })
+                }).catch(() => {
+                    setTimeout(() => {
+                        console.log('初次加载处理完毕，回调开启轮询')
+                        // 无论初始化获取记录是否成功都开启轮询监控
+                        this._pollingParticipantRecords()
+                    }, 1000)
                 })
             },
             // 返回还在空着的 row div infos
@@ -426,13 +432,13 @@
 
                 const len = rowRecordDiv.childNodes.length
                 if (rowNumb === 8) {
-                    console.log('len', len)
-                    if(len === 6){
+                    // 找到列
+                    if (len === 6) {
                         userData = {...userData, ...{marginLeft: 158}}
                         console.log('len userData', userData)
                     }
                 } else if (rowNumb === 9) {
-                    if(len === 11) {
+                    if (len === 12) {
                         userData = {...userData, ...{marginLeft: 68}}
                     }
                 }
@@ -494,8 +500,8 @@
             // 加载微信与会人员数据，在页面初始化的时候执行
             _loadWeChartDataOnPageCreated() {
                 // TODO 测试轮询注释
-                // this._loadParticipantRecords()
-                this._pollingParticipantRecords()
+                this._loadParticipantRecords()
+                // this._pollingParticipantRecords()
             },
             // 加载中奖数据, 中奖纪录查询
             _loadLotteryRecordData() {
