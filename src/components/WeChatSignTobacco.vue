@@ -315,7 +315,6 @@
                         if (i === 8 || i === 9) {
                             this._handler89RowMargin(popArrData, i)
                         }
-                        console.log(i, 'i', emptyNumb)
                         if (i === 12) {
                             // 第13行，共有13个座位
                             if ((pushRowMaxNumb - popArrData.length) === 0) {
@@ -414,7 +413,6 @@
                 }, 1000)
             },
             _pollingParticipantRecordsParser(listData, dataHandlerFinish, rowPushFull) {
-                console.log('listData', listData.length)
                 if (listData.length === 0) {
                     // 递归结束
                     // TODO 准备开启轮询
@@ -445,7 +443,6 @@
                     // 找到列
                     if (len === 6) {
                         userData = {...userData, ...{marginLeft: 158}}
-                        console.log('len userData', userData)
                     }
                 } else if (rowNumb === 9) {
                     if (len === 12) {
