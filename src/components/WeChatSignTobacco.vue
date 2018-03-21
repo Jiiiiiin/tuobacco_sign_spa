@@ -1,8 +1,8 @@
 <template>
     <div class="wechat-sign-tobacco">
-        <!--<div class="item-logo">-->
-        <!--<img class="logo-img" v-lazy="logoBg" alt="云南中烟">-->
-        <!--</div>-->
+        <div class="item-logo">
+            <img class="logo-img" v-lazy="logoBg" alt="云南中烟">
+        </div>
         <div class="box">
             <div class="item-ye">
                 <div class="ye" v-lazy:background-image="yeBg">
