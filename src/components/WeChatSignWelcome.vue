@@ -68,7 +68,8 @@
             }
         },
         mounted() {
-            Notification.error({
+            Notification.info({
+                title: '提示',
                 message: '请点击键盘的Enter，即可进入活动主界面，开启统计',
             })
         }
