@@ -63,7 +63,7 @@ Vue.use(ViewPlus, {
         msgKey: 'ReturnMessage',
         defShowLoading: false,
         onReqErrPaserMsg: (response, errMsg) => {
-            return `${errMsg} [程序员开小差了]`
+            return `${errMsg} [服务端]`
         },
         loading(_showLoading) {
             if (_showLoading) {
