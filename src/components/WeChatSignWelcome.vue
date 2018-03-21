@@ -11,7 +11,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-    import qs from 'qs'
+    // import qs from 'qs'
     import {Notification} from 'element-ui'
 
     const ERR_DIALOG_TITLE = '开小差了'
@@ -27,15 +27,11 @@
             }
         },
         created() {
-
-        },
-        mounted(){
             // const _urlParams = ((_temp) => {
             //     return _temp ? qs.parse(_temp.substring(1, _temp.length)) : null
             // })(window.location.search)
             // this.meetingId = _urlParams.meetingId
             // this.sessionId = _urlParams.sessionId
-
             if(this.$route.params && this.$vp.utilObjHasVal(this.$route.params)) {
                 this.meetingId = this.$route.params.meetingId
                 this.sessionId = this.$route.params.sessionId

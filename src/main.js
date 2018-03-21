@@ -28,7 +28,8 @@ Vue.use(VueLazyload, {
 })
 
 let loadingInstance = null
-export const BASE_URL = 'http://192.168.3.43:8080'
+const ip = '192.168.43.58'
+const BASE_URL = `http://${ip}:8080`
 
 Vue.use(ViewPlus, {
     router,
@@ -52,7 +53,7 @@ Vue.use(ViewPlus, {
     utilHttp: {
         baseURL: BASE_URL,
         // withCredentials: true,
-        timeout: '6000',
+        timeout: '10000',
         headers: {
             Accept: 'application/json, text/plain, */*'
         },
@@ -77,7 +78,7 @@ Vue.use(ViewPlus, {
         },
         errDialog(message = '错误消息未定义') {
             Notification.warning({
-                title: '我们的服务器出现了一点小差了，请稍后尝试',
+                title: '请稍后刷新尝试，或检查网络是否够快',
                 message
             })
             return this

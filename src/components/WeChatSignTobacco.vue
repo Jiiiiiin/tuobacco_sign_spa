@@ -40,7 +40,7 @@
 <script type="text/ecmascript-6">
     import WeChatSignPhotoItem from './WeChatSignPhotoItem.vue'
     import WeChatSignPhotoItemBox from './WeChatSignPhotoItemBox.vue'
-    import {Message, Notification, Badge, Button} from 'element-ui'
+    import {Notification, Badge, Button} from 'element-ui'
     import Vue from 'vue'
     import Zoomerang from 'zoomerang'
 
@@ -92,7 +92,7 @@
                 photoData: [
                     {
                         id: 1,
-                        maxNumb: 2,
+                        maxNumb: 1,
                         // maxNumb: 8,
                         marginLeft: 206,
                         marginTop: 0,
@@ -100,7 +100,7 @@
                     },
                     {
                         id: 2,
-                        maxNumb: 2,
+                        maxNumb: 1,
                         // maxNumb: 10,
                         marginLeft: 228,
                         marginTop: 13,
@@ -108,42 +108,48 @@
                     },
                     {
                         id: 3,
-                        maxNumb: 10,
+                        // maxNumb: 10,
+                        maxNumb: 1,
                         marginLeft: 248,
                         marginTop: 13,
                         list: []
                     },
                     {
                         id: 4,
-                        maxNumb: 11,
+                        // maxNumb: 11,
+                        maxNumb: 1,
                         marginLeft: 269,
                         marginTop: 8,
                         list: []
                     },
                     {
                         id: 5,
-                        maxNumb: 12,
+                        // maxNumb: 12,
+                        maxNumb: 1,
                         marginLeft: 288,
                         marginTop: 12,
                         list: []
                     },
                     {
                         id: 6,
-                        maxNumb: 12,
+                        // maxNumb: 12,
+                        maxNumb: 1,
                         marginLeft: 318,
                         marginTop: 12,
                         list: []
                     },
                     {
                         id: 7,
-                        maxNumb: 11,
+                        // maxNumb: 11,
+                        maxNumb: 1,
                         marginLeft: 368,
                         marginTop: 12,
                         list: []
                     },
                     {
                         id: 8,
-                        maxNumb: 11,
+                        // maxNumb: 11,
+                        maxNumb: 1,
                         marginLeft: 396,
                         marginTop: 12,
                         list: []
@@ -166,21 +172,24 @@
                     },
                     {
                         id: 11,
-                        maxNumb: 11,
+                        // maxNumb: 11,
+                        maxNumb: 1,
                         marginLeft: 211,
                         marginTop: 12,
                         list: []
                     },
                     {
                         id: 12,
-                        maxNumb: 13,
+                        // maxNumb: 13,
+                        maxNumb: 1,
                         marginLeft: 232,
                         marginTop: 9,
                         list: []
                     },
                     {
                         id: 13,
-                        maxNumb: 13,
+                        // maxNumb: 13,
+                        maxNumb: 1,
                         marginLeft: 221,
                         marginTop: 12,
                         list: []
@@ -270,7 +279,7 @@
              * @param res
              * @private
              */
-            _paseParticipantRecords(res) {
+            _parseParticipantRecords(res) {
                 if (!res || !res.List) {
                     Notification.error({
                         title: ERR_DIALOG_TITLE,
@@ -287,7 +296,7 @@
                 // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
                 this.REQ_participantQuery_currentIndex = listData[listData.length - 1].id
                 console.log('REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
-                let participantRecord = document.getElementsByClassName('participantRecord')
+                const participantRecord = document.getElementsByClassName('participantRecord')
                 const len = participantRecord.length
                 for (let i = 0; i < len; i++) {
                     let rowRecordDiv = participantRecord[i]
@@ -325,8 +334,6 @@
                         continue
                     }
                 }
-                // 释放dom引用
-                participantRecord = null
             },
             // 查询所有参会记录
             _loadParticipantRecords() {
@@ -335,7 +342,7 @@
                         currentIndex: this.REQ_participantQuery_currentIndex
                     }
                 }).then(res => {
-                    this._paseParticipantRecords(res)
+                    this._parseParticipantRecords(res)
                     // 放在这里防止两个方法同时处理一个响应数据导致问题（未测试）
                     this._pollingParticipantRecords()
                 }).catch(err => {
@@ -346,7 +353,7 @@
             },
             // 返回还在空着的 row div infos
             _getNoFullRowDiv() {
-                let participantRecord = document.getElementsByClassName('participantRecord')
+                const participantRecord = document.getElementsByClassName('participantRecord')
                 const len = participantRecord.length
                 for (let i = 0; i < len; i++) {
                     let rowRecordDiv = participantRecord[i]
@@ -367,10 +374,8 @@
                 }
                 // 标示 处理完毕，全部填满
                 return null
-                // 释放dom引用
-                participantRecord = null
             },
-            _pasePollingParticipantRecords(amiItem, amiFinishListener) {
+            _parsePollingParticipantRecords(amiItem, amiFinishListener) {
                 // 延迟执行以便先看到头像被放入叶子
                 setTimeout(() => {
                     // 这里处理动画逻辑
@@ -390,59 +395,74 @@
                     setTimeout(() => {
                         amiItem.click()
                         amiFinishListener()
+                        // 当前这个延迟不能小于外层的延迟
                     }, 1000)
-                }, 800)
+                }, 1000)
             },
             _pollingParticipantRecordsParser(listData) {
                 console.log('listData', listData.length)
-                if(listData.length === 0){
+                if (listData.length === 0) {
                     // 递归结束
                     // TODO 准备开启轮询
                     return
                 }
-                const userData = listData.shift()
+                let userData = listData.shift()
                 // console.log('本次需要处理的客户记录', userData)
-                // TODO 看这里是否要处理
                 // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
                 this.REQ_participantQuery_currentIndex = userData.id
                 // console.log('轮询更新REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
                 // 先更新响应数据，拿到最新的一个img dom
                 let rowRecord = this._getNoFullRowDiv()
-                let rowRecordDiv = rowRecord.rowRecordDiv
-                if(!rowRecordDiv){
+                if (rowRecord === null) {
                     // 已经填满
                     // TODO 结束所有轮询
                     console.log('叶子装满咯')
                     return
                 }
+                const rowRecordDiv = rowRecord.rowRecordDiv
                 let harkArr = rowRecord.harkArr
                 // row的numb是从1计数，这里需要从0
                 const rowNumb = harkArr[0] - 1
+
+                const len = rowRecordDiv.childNodes.length
+                if (rowNumb === 8) {
+                    console.log('len', len)
+                    if(len === 6){
+                        userData = {...userData, ...{marginLeft: 158}}
+                        console.log('len userData', userData)
+                    }
+                } else if (rowNumb === 9) {
+                    if(len === 11) {
+                        userData = {...userData, ...{marginLeft: 68}}
+                    }
+                }
                 const pushRow = this.photoData[rowNumb]
                 const pushRowList = pushRow.list
                 pushRowList.push(userData)
                 const pushRowLen = pushRowList.length
                 const pushRowMaxNumb = pushRow.maxNumb
                 const emptyNumb = pushRowMaxNumb - pushRowLen
-                if (emptyNumb === 0) {
-                    console.log('填满了一行', harkArr)
-                    rowRecordDiv.setAttribute('id', `${harkArr[0]}${this.SPLIT_FLAG}1`)
-                    // 一行处理完毕，换一行处理
-                    // 防止setAttribute id 还没有映射到dom，所以起一个setTimeout
-                    this.$nextTick(()=> {
-                        this._pollingParticipantRecordsParser(listData)
-                    })
-                    return
-                }
+
                 // 上面是响应式更新数据，需要等dom填充
                 this.$nextTick(() => {
                     const imagesBox = rowRecordDiv.childNodes
-                    rowRecordDiv = null
                     const len = imagesBox.length
                     // console.log('pushRowList.length', pushRowLen, pushRowMaxNumb, emptyNumb)
-                    this._pasePollingParticipantRecords(imagesBox[len - 1], () => {
-                        // 递归调用，知道本次拿到的后台更新记录处理完毕
-                        this._pollingParticipantRecordsParser(listData)
+                    this._parsePollingParticipantRecords(imagesBox[len - 1], () => {
+                        if (emptyNumb === 0) {
+                            console.log('填满了一行', harkArr)
+                            rowRecordDiv.setAttribute('id', `${harkArr[0]}${this.SPLIT_FLAG}1`)
+                            // 一行处理完毕，换一行处理
+                            // 防止setAttribute id 还没有映射到dom，所以起一个setTimeout
+                            this.$nextTick(() => {
+                                this._pollingParticipantRecordsParser(listData)
+                            })
+                            // 类似递归的一次continue
+                            return
+                        } else {
+                            // 递归调用，知道本次拿到的后台更新记录处理完毕
+                            this._pollingParticipantRecordsParser(listData)
+                        }
                     })
                 })
             },
@@ -468,8 +488,6 @@
                         return
                     }
                     this._pollingParticipantRecordsParser(listData)
-                }).catch(err => {
-                    console.error('轮询参会记录出错', err)
                 })
                 // }, 1000000)
             },
@@ -493,8 +511,8 @@
             this.REQ_participantQuery = `weixin-meeting/${this.meetingId}/${this.sessionId}/participantQuery`
             this.REQ_meetingDraw = `weixin-meeting/${this.meetingId}/${this.sessionId}/meetingDraw`
             this._initItemLotteryRecordArr()
+            // this._loadLotteryRecordData()
             this._loadWeChartDataOnPageCreated()
-            this._loadLotteryRecordData()
         }
     }
 </script>
