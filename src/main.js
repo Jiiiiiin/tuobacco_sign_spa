@@ -79,7 +79,6 @@ Vue.use(ViewPlus, {
         },
         errDialog(message = '错误消息未定义') {
             Notification.warning({
-                title: '请稍后刷新尝试，或检查网络是否够快',
                 message
             })
             return this
