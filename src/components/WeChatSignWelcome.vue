@@ -87,6 +87,7 @@
                 width 979px
                 height 734px
                 margin 0 auto
+                background-size: cover
                 .go-to-home-btn
                     font-size 26px
                     color #ffffff
