@@ -1,11 +1,13 @@
 <template>
     <div class="wechat-sign-tobacco">
-        <div class="item-logo">
-            <img class="logo-img" v-lazy="logoBg" alt="云南中烟">
-        </div>
-        <div class="box" v-lazy:background-image="welcomeBg">
-            <!--<h1 class="err-h1">欢迎页面</h1> <br>-->
-            <router-link :to="mainUrl" class="go-to-home-btn">进入签到主页</router-link>
+        <div class="box">
+            <div class="bg-box"
+                 v-lazy:background-image="welcomeBg">
+                <!--<h1 class="err-h1">欢迎页面</h1> <br>-->
+                <!--<div class="url-box">-->
+                <!--<router-link :to="mainUrl" class="go-to-home-btn">进入签到主页</router-link>-->
+                <!--</div>-->
+            </div>
         </div>
     </div>
 </template>
@@ -44,11 +46,19 @@
             //         duration: 5000
             //     })
             // }
-
-            if(this.$route.params && this.$vp.utilObjHasVal(this.$route.params)) {
+            console.log('this.$route.params', this.$route.params)
+            if (this.$route.params && this.$vp.utilObjHasVal(this.$route.params)) {
                 this.meetingId = this.$route.params.meetingId
                 this.sessionId = this.$route.params.sessionId
                 this.mainUrl = `/WeChatSignTobacco/${this.meetingId}/${this.sessionId}`
+
+                window.document.onkeydown = (event) => {
+                    var e = event || window.event || arguments.callee.caller.arguments[0];
+                    if (e && e.keyCode == 13) { // enter 键
+                        //要做的事情
+                        this.$vp.pageReplace(this.mainUrl)
+                    }
+                }
             } else {
                 Notification.error({
                     title: ERR_DIALOG_TITLE,
@@ -67,19 +77,17 @@
         bottom: 0
         width 100%
         background-color: #7a0402
-        .item-logo
-            position: absolute;
-            top: 0;
-            right: 0;
-            .logo-img
-                width 900px
         .box
             display: flex
             background-color: #7a0402
             align-items: center; /*垂直居中*/
             justify-content: center; /*水平居中*/
             height: 100%;
-            .go-to-home-btn
-                font-size 26px
-                color #ffffff
+            .bg-box
+                width 979px
+                height 734px
+                margin 0 auto
+                .go-to-home-btn
+                    font-size 26px
+                    color #ffffff
 </style>

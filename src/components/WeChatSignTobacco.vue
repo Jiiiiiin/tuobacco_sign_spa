@@ -290,7 +290,6 @@
                 }
                 // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
                 this.REQ_participantQuery_currentIndex = listData[listData.length - 1].id
-                console.log('REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
                 const participantRecord = document.getElementsByClassName('participantRecord')
                 const len = participantRecord.length
                 let IS_PUSH_FULL_YE = false
