@@ -553,7 +553,7 @@
             top: 0;
             right: 0;
             .logo-img
-                width 900px
+                width 600px
         .lottery-box
             position absolute
             top: 33%
@@ -590,6 +590,8 @@
                     width 979px
                     height 734px
                     margin 0 auto
+                    background-repeat: no-repeat;
+                    background-size: cover
                     .ye-top-empty
                         height 69px
                     .photo-row-2
