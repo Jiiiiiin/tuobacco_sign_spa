@@ -8,7 +8,8 @@ import VueLazyload from 'vue-lazyload'
 import plugins from './store/plugins'
 import {Loading} from 'element-ui';
 import './assets/styl/index.styl'
-import { Notification } from 'element-ui';
+import { Notification } from 'element-ui'
+require('vue-animate/dist/vue-animate.min.css')
 
 Vue.use(Vuex)
 

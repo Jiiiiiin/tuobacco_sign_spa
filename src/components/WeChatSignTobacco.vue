@@ -31,16 +31,18 @@
                 <img v-lazy="lotteryBtn" alt="点击抽奖" @click="onLotteryBtnTap">
             </div>
         </div>
-        <!--<el-badge value="host" class="show-recods" @click="onTapQryRecods">-->
-            <!--<el-button size="small">查看记录</el-button>-->
-        <!--</el-badge>-->
+        <p v-show="countSignRecords === 0" class="show-recods" style="color: #fff">等待与会嘉宾到场</p>
+        <!--@click="onTapQryRecods"-->
+        <el-badge :value="countSignRecords" class="show-recods" v-show="countSignRecords > 0">
+            <el-button size="small">与会人数</el-button>
+        </el-badge>
     </div>
 </template>
 
 <script type="text/ecmascript-6">
     import WeChatSignPhotoItem from './WeChatSignPhotoItem.vue'
     import WeChatSignPhotoItemBox from './WeChatSignPhotoItemBox.vue'
-    import {Notification, Badge, Button} from 'element-ui'
+    import {Message, Notification, Badge, Button} from 'element-ui'
     import Vue from 'vue'
     import Zoomerang from 'zoomerang'
 
@@ -60,6 +62,8 @@
         },
         data() {
             return {
+                // 与会总记录数
+                countSignRecords: 0,
                 SPLIT_FLAG: '-',
                 // 轮询setInterval返回对象，用于在【消化数据的时候】暂停
                 POLLING_QRY_INTERVAL: null,
@@ -199,7 +203,7 @@
                     params: {drawNum: 1}
                 }).then(res => {
                     // 这个是如果后台返回的是全量记录，同样可以达到目的
-                    // this._paseWinningRecordData(res)
+                    // this._parseWinningRecordData(res)
                     // 下面的是老接口 同步返回一个中奖用户的情况
                     if (res && res.List && res.List.length === 1) {
                         const weInfo = res.List[0]
@@ -229,7 +233,7 @@
                 // TODO 调到下一个页面查询
             },
             // 处理中奖纪录
-            _paseWinningRecordData(res) {
+            _parseWinningRecordData(res) {
                 const data = res.List
                 const len = data.length
                 for (let i = 0; i < len; i++) {
@@ -254,7 +258,7 @@
              * @param popNumb 需要补充的数量
              * @private
              */
-            _popData2ArryByNumb(arr, popNumb) {
+            _popData2ArrayByNumb(arr, popNumb) {
                 // 直接返回在插入，vue不会把新插入的数据作为响应式数据
                 // 后台返回的数据是，最先参加的人排在数组的最后
                 return arr.splice(0, popNumb)
@@ -284,12 +288,14 @@
                 }
                 // 1.先判断哪一行空着
                 const listData = res.List
-                if (listData && listData.length <= 0) {
+                const listDataLen = listData.length
+                this.countSignRecords += listDataLen
+                if (listData && listDataLen <= 0) {
                     console.warn('没有参会记录数据需要处理')
                     return
                 }
                 // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
-                this.REQ_participantQuery_currentIndex = listData[listData.length - 1].id
+                this.REQ_participantQuery_currentIndex = listData[listDataLen - 1].id
                 const participantRecord = document.getElementsByClassName('participantRecord')
                 const len = participantRecord.length
                 let IS_PUSH_FULL_YE = false
@@ -311,7 +317,7 @@
                         const pushRowMaxNumb = pushRow.maxNumb
                         const emptyNumb = pushRowMaxNumb - pushRowLen
                         // vue 数据侦测https://cn.vuejs.org/v2/guide/list.html#%E6%95%B0%E7%BB%84%E6%9B%B4%E6%96%B0%E6%A3%80%E6%B5%8B
-                        const popArrData = this._popData2ArryByNumb(listData, emptyNumb, pushRowList)
+                        const popArrData = this._popData2ArrayByNumb(listData, emptyNumb, pushRowList)
                         if (i === 8 || i === 9) {
                             this._handler89RowMargin(popArrData, i)
                         }
@@ -391,6 +397,7 @@
             _parsePollingParticipantRecords(amiItem, amiFinishListener) {
                 // 延迟执行以便先看到头像被放入叶子
                 setTimeout(() => {
+                    let msgInstance = null
                     // 这里处理动画逻辑
                     Zoomerang.config({
                         bgColor: '#000',
@@ -398,6 +405,22 @@
                         deepCopy: true,
                         onClose(closeItemDom) {
                             closeItemDom.style.transform = ''
+                            // const closeItemDomTitle = closeItemDom.childNodes[1]
+                            // closeItemDomTitle.style.display = 'none'
+                            const closeItemDomImg = closeItemDom.childNodes[0]
+                            closeItemDomImg.style.backgroundColor = '#dbb756'
+                            closeItemDomImg.style.border = '1px solid #7a0402'
+
+                        },
+                        onOpen(closeItemDom) {
+                            const closeItemDomImg = closeItemDom.childNodes[0]
+                            const closeItemDomTitle = closeItemDomImg.getAttribute('alt')
+                            msgInstance = Message.success({
+                                message: `欢迎 ${closeItemDomTitle} 参加本次会议`,
+                                center: true,
+                                duration: 0
+                            })
+                            document.getElementsByClassName('el-message').item(0).style.zIndex = '100000'
                         }
                     })
                     // 找到row对应的动态添加的一个dom
@@ -407,10 +430,11 @@
                     // 设置自动关闭
                     setTimeout(() => {
                         amiItem.click()
+                        msgInstance.close()
                         amiFinishListener()
                         // 当前这个延迟不能小于外层的延迟
-                    }, 1000)
-                }, 1000)
+                    }, 3000)
+                }, 1500)
             },
             _pollingParticipantRecordsParser(listData, dataHandlerFinish, rowPushFull) {
                 if (listData.length === 0) {
@@ -460,7 +484,14 @@
                 this.$nextTick(() => {
                     const imagesBox = rowRecordDiv.childNodes
                     const len = imagesBox.length
-                    this._parsePollingParticipantRecords(imagesBox[len - 1], () => {
+                    const closeItemDom = imagesBox[len - 1]
+                    const closeItemDomImg = closeItemDom.childNodes[0]
+                    closeItemDomImg.style.backgroundColor = 'transparent'
+                    closeItemDomImg.style.border = 'none'
+                    setTimeout(() => {
+                        this.countSignRecords += 1
+                    }, 1000)
+                    this._parsePollingParticipantRecords(closeItemDom, () => {
                         if (emptyNumb === 0) {
                             console.log('填满了一行', harkArr)
                             rowRecordDiv.setAttribute('id', `${harkArr[0]}${this.SPLIT_FLAG}1`)
@@ -520,7 +551,7 @@
             // 加载中奖数据, 中奖纪录查询
             _loadLotteryRecordData() {
                 this.$vp.ajaxMixin(this.REQ_meetingDrawQuery).then(res => {
-                    this._paseWinningRecordData(res)
+                    this._parseWinningRecordData(res)
                 })
             }
         },
@@ -574,7 +605,11 @@
                     float left
                     margin-right 5px
                     .item-lottery-record-img
-                        width 60px
+                        width 54px
+                        border: 1px solid #7a0402;
+                        padding: 2px;
+                        border-radius: 5px;
+                        background-color: #dbb756;
                         margin-bottom 5px
         .box
             display: flex

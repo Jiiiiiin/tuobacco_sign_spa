@@ -33,7 +33,7 @@
             top: 0;
             right: 0;
             .logo-img
-                width 900px
+                width 600px
         .box
             display: flex
             background-color: #7a0402
