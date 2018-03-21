@@ -290,7 +290,7 @@
                 }
                 // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
                 this.REQ_participantQuery_currentIndex = listData[listData.length - 1].id
-                console.log('REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
+                console.log('初始化查询之后更新的 REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
                 const participantRecord = document.getElementsByClassName('participantRecord')
                 const len = participantRecord.length
                 let IS_PUSH_FULL_YE = false
@@ -316,7 +316,6 @@
                         if (i === 8 || i === 9) {
                             this._handler89RowMargin(popArrData, i)
                         }
-                        console.log(i, 'i', emptyNumb)
                         if (i === 12) {
                             // 第13行，共有13个座位
                             if ((pushRowMaxNumb - popArrData.length) === 0) {
@@ -414,26 +413,29 @@
                     }, 1000)
                 }, 1000)
             },
-            _pollingParticipantRecordsParser(listData, dataHandlerFinish, rowPushFull) {
-                console.log('listData', listData.length)
+            _pollingParticipantRecordsParser(listData, finishPollingParticipantHandler) {
+                console.log('listData', listData.length, listData)
                 if (listData.length === 0) {
-                    // 递归结束
-                    // TODO 准备开启轮询
-                    dataHandlerFinish()
                     return
                 }
                 let userData = listData.shift()
                 // console.log('本次需要处理的客户记录', userData)
                 // 更新 this.REQ_participantQuery_currentIndex 最后一个记录的idx
                 this.REQ_participantQuery_currentIndex = userData.id
-                // console.log('轮询更新REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
+                console.log('轮询更新REQ_participantQuery_currentIndex', this.REQ_participantQuery_currentIndex)
                 // 先更新响应数据，拿到最新的一个img dom
                 let rowRecord = this._getNoFullRowDiv()
+                console.log('rowRecord, ', rowRecord)
                 if (rowRecord === null) {
                     // 已经填满
                     // TODO 结束所有轮询
                     console.log('叶子装满咯')
-                    rowPushFull()
+                    // window.clearInterval(this.POLLING_QRY_INTERVAL)
+                    // 通知第一次调用入口，消化完成
+                    if (finishPollingParticipantHandler) {
+                        console.log('消化完成，通知入口')
+                        finishPollingParticipantHandler()
+                    }
                     return
                 }
                 const rowRecordDiv = rowRecord.rowRecordDiv
@@ -454,6 +456,7 @@
                     }
                 }
                 const pushRow = this.photoData[rowNumb]
+                console.log('pushRow, ', pushRow, rowNumb)
                 const pushRowList = pushRow.list
                 pushRowList.push(userData)
                 const pushRowLen = pushRowList.length
@@ -464,6 +467,7 @@
                 this.$nextTick(() => {
                     const imagesBox = rowRecordDiv.childNodes
                     const len = imagesBox.length
+                    // console.log('pushRowList.length', pushRowLen, pushRowMaxNumb, emptyNumb)
                     this._parsePollingParticipantRecords(imagesBox[len - 1], () => {
                         if (emptyNumb === 0) {
                             console.log('填满了一行', harkArr)
@@ -471,13 +475,13 @@
                             // 一行处理完毕，换一行处理
                             // 防止setAttribute id 还没有映射到dom，所以起一个setTimeout
                             this.$nextTick(() => {
-                                this._pollingParticipantRecordsParser(listData, dataHandlerFinish)
+                                this._pollingParticipantRecordsParser(listData)
                             })
                             // 类似递归的一次continue
                             return
                         } else {
                             // 递归调用，知道本次拿到的后台更新记录处理完毕
-                            this._pollingParticipantRecordsParser(listData, dataHandlerFinish)
+                            this._pollingParticipantRecordsParser(listData)
                         }
                     })
                 })
@@ -500,18 +504,30 @@
                         }
                         // 1.先判断哪一行空着
                         const listData = res.List
-                        if (listData && listData.length <= 0) {
+                        console.log('处理的数据 res.List', res)
+                        const recordLen = listData.length
+                        if (recordLen <= 0) {
                             console.warn('没有参会记录数据需要处理')
-                            return
+                            // 如果没有查到数据就减速轮询的间隔周期
+                            // this.POLLING_QRY_INTERVAL_TIME += this.POLLING_QRY_INTERVAL_TIME
+                            // 修改 POLLING_QRY_INTERVAL_TIME 必须要重启，才会生效
+                            // window.clearInterval(this.POLLING_QRY_INTERVAL)
+                            // this._pollingParticipantRecords()
+                            // console.error('加大了 POLLING_QRY_INTERVAL_TIME', this.POLLING_QRY_INTERVAL_TIME)
+                        } else {
+                            console.log('丢下去处理的数据', listData)
+                            window.clearInterval(this.POLLING_QRY_INTERVAL)
+                            this._pollingParticipantRecordsParser(listData, () => {
+                                console.log('数据消化完成回调')
+                                // 消化完成
+                                // 恢复轮询的间隔周期
+                                // this.POLLING_QRY_INTERVAL_TIME = 5000
+                                // console.error('还原了 POLLING_QRY_INTERVAL_TIME', this.POLLING_QRY_INTERVAL_TIME)
+                                // 修改POLLING_QRY_INTERVAL 必须要重启，才会生效
+                                // window.clearInterval(this.POLLING_QRY_INTERVAL)
+                                this._pollingParticipantRecords()
+                            })
                         }
-                        window.clearInterval(this.POLLING_QRY_INTERVAL)
-                        console.log('将数据丢下去消化，暂停轮询', listData.length)
-                        this._pollingParticipantRecordsParser(listData, () => {
-                            console.log('数据消化完毕，回调，开始新的轮询')
-                            this._pollingParticipantRecords()
-                        }, () => {
-                            console.log('叶子填满回调')
-                        })
                     })
                 }, this.POLLING_QRY_INTERVAL_TIME)
             },

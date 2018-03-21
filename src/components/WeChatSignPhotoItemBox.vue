@@ -4,6 +4,7 @@
                 :img-url="item.headimgurl"
                 :name="item.username"
                 :userid="item.id"
+                :id="'user-'+item.id"
                 :marginLeft="item.marginLeft"
                 v-for="item in itemData"
                 :key="item.id"></we-chat-sign-photo-item>
@@ -12,6 +13,7 @@
 
 <script type="text/ecmascript-6">
     import WeChatSignPhotoItem from './WeChatSignPhotoItem.vue'
+
     export default {
         name: 'we-chat-sign-photo-item-box',
         components: {
