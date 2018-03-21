@@ -31,9 +31,9 @@
                 <img v-lazy="lotteryBtn" alt="点击抽奖" @click="onLotteryBtnTap">
             </div>
         </div>
-        <el-badge value="host" class="show-recods" @click="onTapQryRecods">
-            <el-button size="small">查看记录</el-button>
-        </el-badge>
+        <!--<el-badge value="host" class="show-recods" @click="onTapQryRecods">-->
+            <!--<el-button size="small">查看记录</el-button>-->
+        <!--</el-badge>-->
     </div>
 </template>
 

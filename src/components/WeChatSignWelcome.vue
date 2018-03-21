@@ -3,15 +3,14 @@
         <div class="item-logo">
             <img class="logo-img" v-lazy="logoBg" alt="云南中烟">
         </div>
-        <div class="box">
-            <h1 class="err-h1">欢迎页面</h1> <br>
-            <router-link :to="mainUrl">Go to Main</router-link>
+        <div class="box" v-lazy:background-image="welcomeBg">
+            <!--<h1 class="err-h1">欢迎页面</h1> <br>-->
+            <router-link :to="mainUrl" class="go-to-home-btn">进入签到主页</router-link>
         </div>
     </div>
 </template>
 
 <script type="text/ecmascript-6">
-    // import qs from 'qs'
     import {Notification} from 'element-ui'
 
     const ERR_DIALOG_TITLE = '开小差了'
@@ -21,17 +20,31 @@
         data() {
             return {
                 logoBg: `${this.$vp.options.appUrl}/img/logo-ty.png`,
+                welcomeBg: `${this.$vp.options.appUrl}/img/welcome_bg.jpg`,
                 mainUrl: '/Error',
                 meetingId: NaN,
                 sessionId: NaN
             }
         },
         created() {
+            // &meetingId=1&sessionId=1
+            // import qs from 'qs'
             // const _urlParams = ((_temp) => {
             //     return _temp ? qs.parse(_temp.substring(1, _temp.length)) : null
             // })(window.location.search)
-            // this.meetingId = _urlParams.meetingId
-            // this.sessionId = _urlParams.sessionId
+            // // http://localhost:8080/WeChatSignWelcome?VNK=903f9591&meetingId=1&sessionId=1
+            // console.log('_urlParams', _urlParams)
+            // if (_urlParams) {
+            //     this.meetingId = _urlParams.meetingId
+            //     this.sessionId = _urlParams.sessionId
+            // } else {
+            //     Notification.error({
+            //         title: ERR_DIALOG_TITLE,
+            //         message: '您没有正确进入本会场预设的链接，请联系相关技术人员给予解决。',
+            //         duration: 5000
+            //     })
+            // }
+
             if(this.$route.params && this.$vp.utilObjHasVal(this.$route.params)) {
                 this.meetingId = this.$route.params.meetingId
                 this.sessionId = this.$route.params.sessionId
@@ -43,7 +56,6 @@
                     duration: 5000
                 })
             }
-            console.log('this.$route.params', this.$route.params)
         }
     }
 </script>
@@ -66,10 +78,8 @@
             background-color: #7a0402
             align-items: center; /*垂直居中*/
             justify-content: center; /*水平居中*/
-            width: 85%;
             height: 100%;
-            .err-h1
+            .go-to-home-btn
                 font-size 26px
                 color #ffffff
-                display block
 </style>

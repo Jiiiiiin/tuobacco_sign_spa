@@ -21,7 +21,8 @@ export default new Router({
             redirect: '/WeChatSignWelcome'
         },
         {
-            path: '/WeChatSignWelcome/:meetingId/:sessionId',
+            // path: '/WeChatSignWelcome/:meetingId/:sessionId',
+            path: '/WeChatSignWelcome',
             name: 'WeChatSignWelcome',
             component: WeChatSignWelcome,
             meta: {
