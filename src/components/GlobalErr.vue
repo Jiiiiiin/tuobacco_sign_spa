@@ -4,9 +4,9 @@
             <img class="logo-img" v-lazy="logoBg" alt="云南中烟">
         </div>
         <div class="box">
-            <h1 class="err-h1">您访问的资源未找到，请确认浏览器输入的地址是否正确？</h1> <br>
-            <p style="display: block">如需帮助，请联系：jiiiiiin@yeah.net</p>
+            <h1 class="err-h1 ">您访问的资源未找到，请确认浏览器输入的地址是否正确？<br><p style="display: block">如需帮助，请联系：jiiiiiin@yeah.net</p></h1>
         </div>
+
     </div>
 </template>
 
@@ -39,10 +39,12 @@
             background-color: #7a0402
             align-items: center; /*垂直居中*/
             justify-content: center; /*水平居中*/
-            width: 85%;
             height: 100%;
             .err-h1
                 font-size 26px
                 color #ffffff
-                display block
+            p
+                text-align center
+                font-size 15px
+                margin-top 20px
 </style>
