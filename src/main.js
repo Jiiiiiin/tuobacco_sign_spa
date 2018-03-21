@@ -52,7 +52,7 @@ Vue.use(ViewPlus, {
         enable: true,
     },
     utilHttp: {
-        baseURL: BASE_URL,
+        baseURL: `${BASE_URL}/meeting-server`,
         // withCredentials: true,
         timeout: '10000',
         headers: {
