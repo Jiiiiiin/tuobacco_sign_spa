@@ -530,9 +530,9 @@
         created() {
             this.meetingId = this.$route.params.meetingId
             this.sessionId = this.$route.params.sessionId
-            this.REQ_meetingDrawQuery = `weixin-meeting/${this.meetingId}/${this.sessionId}/meetingDrawQuery`
-            this.REQ_participantQuery = `weixin-meeting/${this.meetingId}/${this.sessionId}/participantQuery`
-            this.REQ_meetingDraw = `weixin-meeting/${this.meetingId}/${this.sessionId}/meetingDraw`
+            this.REQ_meetingDrawQuery = `${this.meetingId}/${this.sessionId}/meetingDrawQuery`
+            this.REQ_participantQuery = `${this.meetingId}/${this.sessionId}/participantQuery`
+            this.REQ_meetingDraw = `${this.meetingId}/${this.sessionId}/meetingDraw`
             this._initItemLotteryRecordArr()
             // this._loadLotteryRecordData()
             this._loadWeChartDataOnPageCreated()
