@@ -12,5 +12,6 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-
+    #app
+        background-color: #7a0402
 </style>
