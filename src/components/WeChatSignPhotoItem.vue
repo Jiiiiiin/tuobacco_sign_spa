@@ -46,6 +46,7 @@
             padding: 1px;
             border-radius: 3px;
             background-color: #dbb756;
+            box-shadow: -1px 1px 2px 1px #7f2b29;
         /*.photo-item-name*/
             /*color #fff*/
             /*font-size 12px*/

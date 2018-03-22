@@ -3,10 +3,6 @@
         <div class="box">
             <div class="bg-box"
                  v-lazy:background-image="welcomeBg">
-                <!--<h1 class="err-h1">欢迎页面</h1> <br>-->
-                <!--<div class="url-box">-->
-                <!--<router-link :to="mainUrl" class="go-to-home-btn">进入签到主页</router-link>-->
-                <!--</div>-->
             </div>
         </div>
     </div>
@@ -14,6 +10,7 @@
 
 <script type="text/ecmascript-6">
     import {Notification} from 'element-ui'
+    import liziCreate from '../util/lizi-bg'
 
     const ERR_DIALOG_TITLE = '开小差了'
 
@@ -72,20 +69,35 @@
                 title: '提示',
                 message: '请点击键盘的Enter，即可进入活动主界面，开启统计',
             })
+            this.$nextTick(() => {
+                // 使用threejs创建粒子背景
+                liziCreate()
+            })
         }
     }
 </script>
+<style>
+    body {
+        background-color: #7a0402;
+        margin: 0px;
+        overflow: hidden;
+    }
 
+    a {
+        color: #0078ff;
+    }
+</style>
 <style lang="stylus" rel="stylesheet/stylus" scoped>
     .wechat-sign-tobacco
         position: absolute
         top: 0
         bottom: 0
         width 100%
-        background-color: #7a0402
+        background-color: transparent
         .box
             display: flex
-            background-color: #7a0402
+            //为了显示threejs的背景
+            /*background-color: #7a0402*/
             align-items: center; /*垂直居中*/
             justify-content: center; /*水平居中*/
             height: 100%;

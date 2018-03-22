@@ -611,6 +611,7 @@
                         border-radius: 5px;
                         background-color: #dbb756;
                         margin-bottom 5px
+                        box-shadow: -1px 1px 2px 1px #7f2b29;
         .box
             display: flex
             background-color: #7a0402

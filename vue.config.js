@@ -1,9 +1,4 @@
 'use strict'
-const path = require('path')
-
-function resolve (dir) {
-    return path.join(__dirname, '..', dir)
-}
 
 module.exports = {
     devServer: {
@@ -26,5 +21,5 @@ module.exports = {
     },
     // 在生产版本中使用babel＆TS的thread-loader
     // 如果机器拥有多个核心，则默认启用
-    parallel: require('os').cpus().length > 1,
+    parallel: require('os').cpus().length > 1
 }

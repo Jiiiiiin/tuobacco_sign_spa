@@ -9,7 +9,7 @@ import plugins from './store/plugins'
 import {Loading} from 'element-ui';
 import './assets/styl/index.styl'
 import { Notification } from 'element-ui'
-require('vue-animate/dist/vue-animate.min.css')
+// require('vue-animate/dist/vue-animate.min.css')
 
 Vue.use(Vuex)
 
@@ -29,9 +29,9 @@ Vue.use(VueLazyload, {
 })
 
 let loadingInstance = null
-const ip = '192.168.3.43'
-const BASE_URL = `http://${ip}:8080`
-// const BASE_URL = 'http://yun1.tuobacco.com'
+// const ip = '192.168.43.58'
+// const BASE_URL = `http://${ip}:8080`
+const BASE_URL = 'http://yun1.tuobacco.com'
 
 Vue.use(ViewPlus, {
     router,
