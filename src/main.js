@@ -6,7 +6,6 @@ import Navigation from 'vue-navigation'
 import ViewPlus from 'vue-viewplus'
 import VueLazyload from 'vue-lazyload'
 import plugins from './store/plugins'
-import {Loading} from 'element-ui';
 import './assets/styl/index.styl'
 import { Notification } from 'element-ui'
 // require('vue-animate/dist/vue-animate.min.css')
@@ -28,7 +27,6 @@ Vue.use(VueLazyload, {
     attempt: 1
 })
 
-let loadingInstance = null
 // const ip = '192.168.43.58'
 // const BASE_URL = `http://${ip}:8080`
 const BASE_URL = 'http://yun1.tuobacco.com'
@@ -65,18 +63,6 @@ Vue.use(ViewPlus, {
         defShowLoading: false,
         onReqErrPaserMsg: (response, errMsg) => {
             return `${errMsg} [服务端]`
-        },
-        loading(_showLoading) {
-            if (_showLoading) {
-                loadingInstance = Loading.service()
-            }
-        },
-        hideLoading() {
-            if (loadingInstance) {
-                setTimeout(() => {
-                    loadingInstance.close()
-                }, 0)
-            }
         },
         errDialog(message = '错误消息未定义') {
             Notification.warning({
