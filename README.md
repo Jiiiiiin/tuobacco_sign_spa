@@ -2,6 +2,9 @@
 
 > 一个PC端显示微信签到用户头像到异形图像中的小demo，也是[vue-viewplus](https://www.npmjs.com/package/vue-viewplus)的一个示例；
 
++ 效果
+![](https://ws4.sinaimg.cn/large/006tNbRwgy1fplgy6c2eug318g0l6kjl.gif)
+
 + 实现了排队和轮询来处理签到用户数据，基本实现了一个队列处理流程
 + 使用[zoomerang](https://www.npmjs.com/package/zoomerang)实现了在消化单个用户数据时候的头像动画，提一句，在寻找这种动画效果的时候发现，而且这个插件是Vue作者实现，真是很巧，我是vuer，哈哈
 <!-- + 还计划使用[vue-animate]()完成抽奖的动画处理，但是时间原因没有继续 -->
